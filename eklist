@@ -1,0 +1,49 @@
+#!/usr/bin/python3
+
+import sys
+import struct
+import mmap
+
+import echolab2.instruments.util.simrad_parsers as sp
+import echolab2.instruments.util.simrad_raw_file as raw
+
+import actions as act
+
+def parse(str):
+    # duplicates the simrad_raw_file.DGRAM_TYPE_KEY, but with bytestring keys
+    parsers = {
+          b'BOT' : sp.SimradBottomParser()
+        , b'CON' : sp.SimradConfigParser()
+        , b'DEP' : sp.SimradDepthParser()
+        , b'FIL' : sp.SimradFILParser()
+        , b'MRU' : sp.SimradMRUParser()
+        , b'NME' : sp.SimradNMEAParser()
+        , b'RAW' : sp.SimradRawParser()
+        , b'TAG' : sp.SimradAnnotationParser()
+        , b'XML' : sp.SimradXMLParser()
+    }
+
+    dgram_type = str[:3]
+    p = parsers[dgram_type]
+    return(p.from_string(str, len(str)))
+
+def process(f, filters=[], actions=[]):
+    with open(f, "rb") as fh:
+        print(f)
+        with mmap.mmap(fh.fileno(), length=0, access=mmap.ACCESS_READ) as mf:
+            pos = 0
+            count = 0
+            while pos < len(mf):
+                l, m = struct.unpack('<l4s', mf[pos:pos+8])
+                v = struct.unpack('<l', mf[pos+l+4:pos+l+8])
+                print('Datagram ', count, ' at pos ', pos, ', length ',l,', type', m, ', control lenght', v[0]==l)
+                obj = parse(mf[pos+4:pos+4+l])
+                # if any filters, apply them
+                for a in actions:
+                    a(obj)
+                pos += l+8
+                count += 1
+
+
+for f in sys.argv[1:]:
+    process(f, actions=[act.checkdate])
