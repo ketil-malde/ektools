@@ -27,7 +27,7 @@ def parse(str):
     p = parsers[dgram_type]
     return(p.from_string(str, len(str)))
 
-def process(f, filters=[], actions=[]):
+def process(f, verbose=False, filters=[], actions=[]):
     with open(f, "rb") as fh:
         print(f)
         with mmap.mmap(fh.fileno(), length=0, access=mmap.ACCESS_READ) as mf:
@@ -35,10 +35,15 @@ def process(f, filters=[], actions=[]):
             count = 0
             while pos < len(mf):
                 l, m = struct.unpack('<l4s', mf[pos:pos+8])
+                if pos+l > len(mf):
+                    raise Exception('Premature EOF, truncated RAW file?')
                 v = struct.unpack('<l', mf[pos+l+4:pos+l+8])
-                print('Datagram ', count, ' at pos ', pos, ', length ',l,', type', m, ', control lenght', v[0]==l)
-                obj = parse(mf[pos+4:pos+4+l])
+                t = m.decode('latin-1')
+                if v[0]!=l: print(f'Warning: datagram {count}: control lenght mismatch ({l} vs {v[0]}) - endianness error or corrupt file?')
+                if verbose:
+                    print(f'Datagram {count}:\t{pos}\t{l}\t{t}')
                 # if any filters, apply them
+                obj = parse(mf[pos+4:pos+4+l])
                 for a in actions:
                     a(obj)
                 pos += l+8
@@ -46,4 +51,4 @@ def process(f, filters=[], actions=[]):
 
 
 for f in sys.argv[1:]:
-    process(f, actions=[act.checkdate])
+    process(f, verbose=True, actions=[act.checkdate])
