@@ -10,6 +10,7 @@ import echolab2.instruments.util.simrad_raw_file as raw
 import actions as act
 
 def parse(str):
+    '''Table for selecting the correct parser to use for datagrams'''
     # duplicates the simrad_raw_file.DGRAM_TYPE_KEY, but with bytestring keys
     parsers = {
           b'BOT' : sp.SimradBottomParser()
@@ -27,28 +28,34 @@ def parse(str):
     p = parsers[dgram_type]
     return(p.from_string(str, len(str)))
 
-def process(f, verbose=False, filters=[], actions=[]):
+def index(f):
+    '''Build an index of datagrams in a Simrad RAW file'''
+    idx = []
     with open(f, "rb") as fh:
-        print(f)
         with mmap.mmap(fh.fileno(), length=0, access=mmap.ACCESS_READ) as mf:
             pos = 0
-            count = 0
             while pos < len(mf):
                 l, m = struct.unpack('<l4s', mf[pos:pos+8])
                 if pos+l > len(mf):
                     raise Exception('Premature EOF, truncated RAW file?')
                 v = struct.unpack('<l', mf[pos+l+4:pos+l+8])
                 t = m.decode('latin-1')
-                if v[0]!=l: print(f'Warning: datagram {count}: control lenght mismatch ({l} vs {v[0]}) - endianness error or corrupt file?')
-                if verbose:
-                    print(f'Datagram {count}:\t{pos}\t{l}\t{t}')
-                # if any filters, apply them
-                obj = parse(mf[pos+4:pos+4+l])
-                for a in actions:
-                    a(obj)
+                if v[0]!=l: print(f'Warning: datagram at {pos}: control lenght mismatch ({l} vs {v[0]}) - endianness error or corrupt file?')
+                idx.append((pos,t,l,mf[pos+4:pos+4+l]))
                 pos += l+8
-                count += 1
+    return idx
+
+def process(df, verbose=False, filters=[], actions=[]):
+    '''Process an indexed Simrad RAW file by applying a set of actions'''
+    for (p, t, l, bstr) in df:
+        if verbose:
+            print(f'Datagram {count}:\t{pos}\t{l}\t{t}')
+        # if any filters, apply them
+        obj = parse(bstr)
+        for a in actions:
+            a(obj)
 
 
 for f in sys.argv[1:]:
-    process(f, verbose=True, actions=[act.checkdate])
+    d = index(f)
+    process(d, verbose=True, actions=[act.checkdate])
