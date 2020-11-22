@@ -47,9 +47,11 @@ def index(f):
 
 def process(df, verbose=False, filters=[], actions=[]):
     '''Process an indexed Simrad RAW file by applying a set of actions'''
-    for (p, t, l, bstr) in df:
+    count = 0
+    for pos, t, l, bstr in df:
         if verbose:
             print(f'Datagram {count}:\t{pos}\t{l}\t{t}')
+        count += 1
         # if any filters, apply them
         obj = parse(bstr)
         for a in actions:
