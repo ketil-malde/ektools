@@ -6,6 +6,13 @@ def checkdate(obj):
         print(f'Warning: datagram timestamp {obj["timestamp"]} looks unreasonable to me.')
         # print(obj)
 
+def showdict(obj, indent=4):
+    for k in obj.keys():
+        if type(obj[k]) == type({}):
+            showdict(obj[k], indent+4)
+        else:
+            print(indent*' ', k, repr(obj[k])[:72])
+
 def checkgps(obj):
     # For NMEA GPS datagrams, check that timestamp matches GPS time
     return None
