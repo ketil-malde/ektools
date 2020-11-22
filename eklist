@@ -52,16 +52,16 @@ def process(df, verbose=False, filters=[], actions=[]):
         if verbose:
             print(f'Datagram {count}:\t{pos}\t{l}\t{t}')
         count += 1
-        # if any filters, apply them
-        obj = parse(bstr)
-        if filters==[] or any(f(obj)  for f in filters):
-            for a in actions:
-                a(obj)
+        if actions:
+            obj = parse(bstr)
+            if not filters or any(f(pos,t,l,obj)  for f in filters):
+                for a in actions:
+                    a(obj)
 
 def filterby(types):
-    def f(obj):
-        return any(t == obj['type'] for t in types)
-    return
+    def f(p,t,l,obj):
+        return any(ty == obj['type'] for ty in types)
+    return f
 
 if __name__ == '__main__':
 
@@ -83,6 +83,7 @@ if __name__ == '__main__':
             exit -1
         else:
             actions.append(act.showdict)
+
     fs = []
     if args.type: fs.append(filterby(args.type))
     
