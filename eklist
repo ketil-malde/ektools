@@ -54,10 +54,39 @@ def process(df, verbose=False, filters=[], actions=[]):
         count += 1
         # if any filters, apply them
         obj = parse(bstr)
-        for a in actions:
-            a(obj)
+        if filters==[] or any(f(obj)  for f in filters):
+            for a in actions:
+                a(obj)
 
+def filterby(types):
+    def f(obj):
+        return any(t == obj['type'] for t in types)
+    return
 
-for f in sys.argv[1:]:
-    d = index(f)
-    process(d, verbose=True, actions=[act.checkdate])
+if __name__ == '__main__':
+
+    import argparse
+
+    p = argparse.ArgumentParser(description='Extract information from Simrad RAW files.')
+    p.add_argument('-t', '--type',  default=[], action='append', help='only apply to given datagram types')
+    p.add_argument('-l', '--list',  action='store_true', help='output datagram contents extensively')
+    p.add_argument('-q', '--quiet', action='store_true', help='produce minimal output')
+    p.add_argument('-c', '--check', action='store_true', help='check datagram contents for consistency')
+    p.add_argument('FILE', nargs='+', help='input files in RAW format.')
+    args = p.parse_args()
+    
+    actions = []
+    if args.check: actions.append(act.checkdate)
+    if args.list:
+        if args.quiet:
+            error('Please specify at most one of -l and -q')
+            exit -1
+        else:
+            actions.append(act.showdict)
+    fs = []
+    if args.type: fs.append(filterby(args.type))
+    
+    for f in args.FILE:
+        # print(f)
+        d = index(f)
+        process(d, verbose=not args.quiet, actions=actions, filters=fs)
