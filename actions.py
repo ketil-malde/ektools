@@ -1,6 +1,6 @@
 # Actions to take
 from datetime import datetime
-from output import warn, error
+from ektools import warn, error
 
 def checkdate():
     zeros = 0
