@@ -1,11 +1,25 @@
 # Actions to take
 from datetime import datetime
+from output import warn, error
 
-def checkdate(obj):
-    if obj is None: return
-    if obj['timestamp'] > datetime(2050, 1, 1, 0, 0) or obj['timestamp'] < datetime(1975, 1, 1, 0, 0):
-        print(f'Warning: datagram timestamp {obj["timestamp"]} looks unreasonable to me.')
-        # print(obj)
+def checkdate():
+    zeros = 0
+    suspicious = 0
+    def check(obj):
+        nonlocal zeros
+        nonlocal suspicious
+        if obj is None:
+            if zeros + suspicious > 0:
+                warn(f'There were {zeros + suspicious} timestamp warnings:')
+                warn(f'    Date fields of zero: {zeros}')
+                warn(f'    Otherwise suspicious: {suspicious}')
+        elif obj['low_date'] == 0 and obj['high_date'] == 0:
+            warn(f'Datagram timestamp is zero.')
+            zeros += 1
+        elif obj['timestamp'] > datetime(2050, 1, 1, 0, 0) or obj['timestamp'] < datetime(1975, 1, 1, 0, 0):
+            warn(f'Datagram timestamp {obj["timestamp"]} does not look reasonable.')
+            suspicious += 1
+    return check
 
 def checkgps(obj):
     if obj is None: return
@@ -29,6 +43,7 @@ def summarize():
     s = {}
     def sm(obj):
         if obj is None:
+            print('Summary of contents:')
             showdict(s)
             return
         else:

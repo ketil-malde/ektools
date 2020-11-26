@@ -8,6 +8,7 @@ import echolab2.instruments.util.simrad_parsers as sp
 import echolab2.instruments.util.simrad_raw_file as raw
 
 import actions as act
+from output import warn, error
 
 def parse(str):
     '''Table for selecting the correct parser to use for datagrams'''
@@ -40,7 +41,7 @@ def index(f):
                     raise Exception('Premature EOF, truncated RAW file?')
                 v = struct.unpack('<l', mf[pos+l+4:pos+l+8])
                 t = m.decode('latin-1')
-                if v[0]!=l: print(f'Warning: datagram at {pos}: control lenght mismatch ({l} vs {v[0]}) - endianness error or corrupt file?')
+                if v[0]!=l: warn(f'Datagram at {pos}: control lenght mismatch ({l} vs {v[0]}) - endianness error or corrupt file?')
                 idx.append((pos,t,l,mf[pos+4:pos+4+l]))
                 pos += l+8
     return idx
@@ -75,12 +76,12 @@ if __name__ == '__main__':
     args = p.parse_args()
     
     actions = []
-    if args.check: actions.append(act.checkdate)
+    if args.check: actions.append(act.checkdate())
     if args.summarize: actions.append(act.summarize())
     if args.list:
         if args.quiet:
             error('Please specify at most one of -l and -q')
-            exit -1
+            exit(-1)
         else:
             actions.append(act.showdict)
 
