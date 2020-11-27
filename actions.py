@@ -30,7 +30,9 @@ def showdict(obj, indent=4):
     if obj is None: return
     for k in obj.keys():
         if type(obj[k]) == type({}):
+            print(indent*' ',k,'{')
             showdict(obj[k], indent+4)
+            print(indent*' ','}')
         else:
             print(indent*' ', k, repr(obj[k])[:72])
 
