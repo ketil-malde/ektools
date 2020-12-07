@@ -1,20 +1,12 @@
-# class bcolors:
-    # FAIL =
-    # OKGREEN = '\033[92m'
-    # WARNING =
-    # OKBLUE = '\033[94m'
-    # HEADER = '\033[95m'
-    # OKCYAN = '\033[96m'
-    # ENDC = 
-    # BOLD = '\033[1m'
-    # UNDERLINE = '\033[4m'
-
 import sys
 import struct
 import mmap
 
 import echolab2.instruments.util.simrad_parsers as sp
 import echolab2.instruments.util.simrad_raw_file as raw
+
+# text colors: GREEN = '\033[92m', BLUE = '\033[94m', HEADER = '\033[95m', CYAN = '\033[96m', BOLD = '\033[1m', UNDERLINE = '\033[4m'
+#              CLEAR = '\033[0m', YELLOW = '\033[93m', RED = '\033[91m'
 
 def warn(*args, **kwargs):
     print('\033[93mWarning\033[0m',*args, file=sys.stderr, **kwargs)
