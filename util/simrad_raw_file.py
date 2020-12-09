@@ -222,7 +222,6 @@ class RawSimradFile(BufferedReader):
                     file_pos=(self._tell_bytes(), self.tell()))
         else:
             dgram_type = buf
-        dgram_type = dgram_type.decode('iso-8859-1')
 
         #  11/26/19 - RHT
         #  As part of the rewrite of read to remove the reverse seeking,
@@ -349,7 +348,7 @@ class RawSimradFile(BufferedReader):
         #  11/26/19 - RHT - Modified this method to pass through the number of
         #  bytes read so we can bubble that up to the user.
 
-        dgram_type = raw_datagram_string[:3].decode('iso-8859-1')
+        dgram_type = raw_datagram_string[:3]
         try:
             parser = self.DGRAM_TYPE_KEY[dgram_type]
         except KeyError:
