@@ -1553,13 +1553,13 @@ class SimradRawParser(_SimradDatagramParser):
                 indx = self.header_size(version)
 
                 if int(data['mode']) & 0x1:
-                    data['power'] = np.fromstring(raw_string[indx:indx + block_size], dtype='int16')
+                    data['power'] = np.frombuffer(raw_string[indx:indx + block_size], dtype='int16')
                     indx += block_size
                 else:
                     data['power'] = None
 
                 if int(data['mode']) & 0x2:
-                    data['angle'] = np.fromstring(raw_string[indx:indx + block_size], dtype='uint8')
+                    data['angle'] = np.frombuffer(raw_string[indx:indx + block_size], dtype='uint8')
                     data['angle'].shape = (data['count'], 2)
                 else:
                     data['angle'] = None
@@ -1580,13 +1580,13 @@ class SimradRawParser(_SimradDatagramParser):
                 indx = self.header_size(version)
 
                 if data['data_type'] & 0b1:
-                    data['power'] = np.fromstring(raw_string[indx:indx + block_size], dtype='int16')
+                    data['power'] = np.frombuffer(raw_string[indx:indx + block_size], dtype='int16')
                     indx += block_size
                 else:
                     data['power'] = None
 
                 if data['data_type'] & 0b10:
-                    data['angle'] = np.fromstring(raw_string[indx:indx + block_size], dtype='uint8')
+                    data['angle'] = np.frombuffer(raw_string[indx:indx + block_size], dtype='uint8')
                     data['angle'].shape = (data['count'], 2)
                     indx += block_size
                 else:
