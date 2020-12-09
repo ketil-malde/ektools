@@ -1185,7 +1185,7 @@ class SimradConfigParser(_SimradDatagramParser):
         #  typing system used for parsing XML data doesn't come into play. Here
         #  we define the dict keys and binary data types for CON0 headers.
 
-        self._transducer_headers = {'ER60':[('channel_id', '128s'),
+        self._transducer_headers = {b'ER60':[('channel_id', '128s'),
                                        ('beam_type', 'l'),
                                        ('frequency', 'f'),
                                        ('gain', 'f'),
@@ -1211,7 +1211,7 @@ class SimradConfigParser(_SimradDatagramParser):
                                        ('gpt_software_version', '16s'),
                                        ('spare4', '28s')
                                        ],
-                                    'ES60':[('channel_id', '128s'),
+                                    b'ES60':[('channel_id', '128s'),
                                        ('beam_type', 'l'),
                                        ('frequency', 'f'),
                                        ('gain', 'f'),
@@ -1237,7 +1237,7 @@ class SimradConfigParser(_SimradDatagramParser):
                                        ('gpt_software_version', '16s'),
                                        ('spare4', '28s')
                                        ],
-                                    'MBES':[('channel_id', '128s'),
+                                    b'MBES':[('channel_id', '128s'),
                                        ('beam_type', 'l'),
                                        ('frequency', 'f'),
                                        ('reserved1', 'f'),
@@ -1297,7 +1297,7 @@ class SimradConfigParser(_SimradDatagramParser):
                 common_params[field] = header_data[field].strip(b'\x00')
 
             sounder_name = common_params['sounder_name']
-            if sounder_name == 'MBES':
+            if sounder_name == b'MBES':
                 _me70_extra_values = struct.unpack('=hLff', header_data['spare0'][:14])
                 common_params['multiplexing'] = _me70_extra_values[0]
                 common_params['time_bias'] = _me70_extra_values[1]
@@ -1318,8 +1318,8 @@ class SimradConfigParser(_SimradDatagramParser):
                     list(self._transducer_headers.keys()))
                 log.warning('Will use ER60 transducer config fields as default')
 
-                transducer_header = self._transducer_headers['ER60']
-                _sounder_name_used = 'ER60'
+                transducer_header = self._transducer_headers[b'ER60']
+                _sounder_name_used = b'ER60'
 
             txcvr_header_fields = [x[0] for x in transducer_header]
             txcvr_header_fmt    = '=' + ''.join([x[1] for x in transducer_header])
@@ -1334,7 +1334,7 @@ class SimradConfigParser(_SimradDatagramParser):
                 txcvr = data['configuration'].setdefault(channel_id, {})
                 txcvr.update(common_params)
 
-                if _sounder_name_used in ['ER60', 'ES60']:
+                if _sounder_name_used in [b'ER60', b'ES60']:
                     for txcvr_field_indx, field in enumerate(txcvr_header_fields[:17]):
                         txcvr[field] = txcvr_header_values[txcvr_field_indx]
 
@@ -1347,7 +1347,7 @@ class SimradConfigParser(_SimradDatagramParser):
                     txcvr['gpt_software_version'] = txcvr_header_values[35]
                     txcvr['spare4']               = txcvr_header_values[36]
 
-                elif _sounder_name_used  == 'MBES':
+                elif _sounder_name_used  == b'MBES':
                     for txcvr_field_indx, field in enumerate(txcvr_header_fields):
                         txcvr[field] = txcvr_header_values[txcvr_field_indx]
 
@@ -1386,7 +1386,7 @@ class SimradConfigParser(_SimradDatagramParser):
             data['transceiver_count'] = len(data['configuration'])
 
             sounder_name = first_conf['sounder_name']
-            if sounder_name == 'MBES':
+            if sounder_name == b'MBES':
                 _packed_me70_values = struct.pack('=hLff', first_conf['multiplexing'],
                     first_conf['time_bias'], first_conf['sound_velocity_avg'], first_conf['sound_velocity_transducer'])
                 first_conf['spare0'] = _packed_me70_values + first_conf['spare0'][14:]
@@ -1406,8 +1406,8 @@ class SimradConfigParser(_SimradDatagramParser):
                 transducer_header = self._transducer_headers[sounder_name]
                 _sounder_name_used = sounder_name
             except KeyError:
-                transducer_header = self._transducer_headers['ER60']
-                _sounder_name_used = 'ER60'
+                transducer_header = self._transducer_headers[b'ER60']
+                _sounder_name_used = b'ER60'
 
             txcvr_header_fields = [x[0] for x in transducer_header]
             txcvr_header_fmt    = '=' + ''.join([x[1] for x in transducer_header])
@@ -1415,7 +1415,7 @@ class SimradConfigParser(_SimradDatagramParser):
             for txcvr_indx, txcvr in list(data['configuration'].items()):
                 txcvr_contents = []
 
-                if _sounder_name_used in ['ER60', 'ES60']:
+                if _sounder_name_used in [b'ER60', b'ES60']:
                     for field in txcvr_header_fields[:17]:
                         #  Python 3 convert str to bytes
                         if isinstance(txcvr[field], str):
@@ -1435,7 +1435,7 @@ class SimradConfigParser(_SimradDatagramParser):
 
                     txcvr_contents_str = struct.pack(txcvr_header_fmt, *txcvr_contents)
 
-                elif _sounder_name_used == 'MBES':
+                elif _sounder_name_used == b'MBES':
                     for field in txcvr_header_fields:
                         txcvr_contents.append(txcvr[field])
 
