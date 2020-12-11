@@ -53,8 +53,7 @@ def rawinfo():
             print('s_v:   ', type3_convert(config[obj['frequency']], obj))
     return ri
 
-from math import log10, pi
-import numpy as np
+from conversion import calc_sv
 
 def type3_convert(cnf, obj):
     '''Converting raw power to s_v using Type 3 definition from the NetCDF standard'''
@@ -68,31 +67,8 @@ def type3_convert(cnf, obj):
         sample_interval = obj['sample_interval'],         # transducer sampling rate
         eq_beam_angle   = cnf['equivalent_beam_angle'],   # ?
         pulse_length    = obj['pulse_length'],            # lenght of each ping
-        sa_corr         = 0     # FIXME: cnf['sa_correction_table'] , but it is an array, which element to use?
+        sa_corr         = -0.57     # FIXME: cnf['sa_correction_table'] , but it is an array, which element to use?
     )
-
-def calc_sv(P_c, alpha, pt, sound_vel, wavelen, transducer_gain, sample_interval, eq_beam_angle, pulse_length, sa_corr):
-    '''Converting raw power to s_v using Type 3 definition from the NetCDF standard'''
-    # capitalized variables are vectors, lower case are scalars
-
-    gain = pt * wavelen**2 / (16*pi**2)
-    pulse_duration = pulse_length * 10**(2*sa_corr/10)
-
-    P_received = 10 * log10(2)/256 * P_c  # is this really correct?
-
-    n = P_received.shape[0]
-    Rng = np.linspace(start = 0,stop = n * sound_vel/2 * sample_interval, num=n)
-    print('Rng:', Rng[:50])   # not exactly same, but very close. Ricks start with three zeros?  And then it is roughly 0.2% lower...
-
-    Beam_expansion = 20 * np.log10(Rng)  # this is the same as time varied gain, TVG
-    print('Beam_exp:', Beam_expansion[:50])   # this matches well with range, is -Inf when Rng is 0
-
-    Absorption = 2*alpha*Rng
-    print('Absorption:', Absorption[:50])
-
-    # TS = P_received + 2*Beam_expansion + Absorption - 10*log10(gain) - 2*transducer_gain
-    sv = P_received + Beam_expansion + Absorption - 10*log10 (gain * sound_vel * 10**(eq_beam_angle/10) * pulse_duration /2) - 2*transducer_gain
-    return(sv)
 
 def summarize():
     s = {}
