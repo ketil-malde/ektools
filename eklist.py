@@ -31,12 +31,14 @@ if __name__ == '__main__':
     p.add_argument('-s', '--summarize', action='store_true', help='summarize datagrams')
     p.add_argument('-q', '--quiet', action='store_true', help='produce minimal output')
     p.add_argument('-c', '--check', action='store_true', help='check datagram contents for consistency')
+    p.add_argument('-r', '--rawinfo', action='store_true', help='info on raw datagrams')
     p.add_argument('FILE', nargs='+', help='input files in RAW format.')
     args = p.parse_args()
     
     actions = []
-    if args.check: actions.append(act.checkdate())
+    if args.check:     actions.append(act.checkdate())
     if args.summarize: actions.append(act.summarize())
+    if args.rawinfo:   actions.append(act.rawinfo())
     if args.list:
         if args.quiet:
             error('Please specify at most one of -l and -q')
