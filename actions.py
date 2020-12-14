@@ -39,7 +39,6 @@ def showdict(obj, indent=4):
 def rawinfo():
     config = {}
     def ri(obj):
-        print('RI', obj['type'])
         if obj is None:
             return
         elif obj['type'] == 'CON0':
@@ -49,14 +48,25 @@ def rawinfo():
                 tcf = cf[transp]
                 config[tcf['frequency']] = tcf
         elif obj['type'][:3] == 'RAW':
-            print('Power: ', obj['power'])
             print('s_v:   ', type3_convert(config[obj['frequency']], obj))
+            print('angle:', obj['angle'])
+            # adjust for: heave, transducer_depth
+            # convert the angles?
+            # keep timestamp, frequency, temperature, ...and?
     return ri
 
 from conversion import calc_sv
+import numpy as np
 
 def type3_convert(cnf, obj):
     '''Converting raw power to s_v using Type 3 definition from the NetCDF standard'''
+
+    # obj[pulse_length] has float, and accuracy loss means approximate search
+    idx = np.where((cnf['pulse_length_table']-obj['pulse_length'])**2 < 0.0001**2)[0][0]
+    sa_corr = cnf['sa_correction_table'][idx]
+    # check that this also corresponds to gain?
+    assert((cnf['gain_table'][idx]-cnf['gain'])**2 < 0.0001)
+    
     return calc_sv(
         P_c             = obj['power'],                   # vector of power received
         alpha           = obj['absorption_coefficient'],  # acoustic attenuation
@@ -67,7 +77,7 @@ def type3_convert(cnf, obj):
         sample_interval = obj['sample_interval'],         # transducer sampling rate
         eq_beam_angle   = cnf['equivalent_beam_angle'],   # ?
         pulse_length    = obj['pulse_length'],            # lenght of each ping
-        sa_corr         = -0.57     # FIXME: cnf['sa_correction_table'] , but it is an array, which element to use?
+        sa_corr         = sa_corr
     )
 
 def summarize():

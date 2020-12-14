@@ -1,6 +1,8 @@
 from math import log10, pi
 import numpy as np
 
+DEBUG = False
+
 def calc_sv(P_c, alpha, pt, sound_vel, wavelen, transducer_gain, sample_interval, eq_beam_angle, pulse_length, sa_corr):
     '''Converting EK60 raw power to s_v using Type 3 definition from the NetCDF standard'''
     # capitalized variables are vectors, lower case are scalars
@@ -14,6 +16,7 @@ def calc_sv(P_c, alpha, pt, sound_vel, wavelen, transducer_gain, sample_interval
 
     # EK60 stores received signal as fixpoint log2 values
     P_received = 10 * log10(2)/256 * P_c 
+    if DEBUG: print('P_rec:', P_received[:50])
 
     # Range is sample interval times the speed of sound.  In pyEcholab, it starts with two extra zeros, due to "receiver delay" (line 1563, EK60.py).
     # After this shift, the values are still slightly higher than pyEcholab.
@@ -26,20 +29,22 @@ def calc_sv(P_c, alpha, pt, sound_vel, wavelen, transducer_gain, sample_interval
     thickness = sound_vel/2 * sample_interval
     Rng = np.zeros(n)
     Rng[TVG_CORRECTION:] = np.linspace(start = 0,stop = (n-TVG_CORRECTION) * sound_vel/2 * sample_interval, num=n-TVG_CORRECTION)
+    if DEBUG: print('Rng:', Rng[:50])
 
     # TVG.  Set any negative values to zero.  
     TVG = np.maximum(np.zeros(n), 20 * np.log10(Rng))
 
     Absorption = 2*alpha*Rng
-    print('Absorption:', Absorption[:50])
 
     # TS = P_received + 2*TVG + Absorption - 10*log10(gain) - 2*transducer_gain
     Sv = P_received + TVG + Absorption - 10*log10 (gain * sound_vel * 10**(eq_beam_angle/10) * pulse_duration /2) - 2*transducer_gain
+    if DEBUG: print('Sv:', Sv[:50])
     sv = 10**(Sv/10)
     return(sv)
 
 
-def calc_angles():
+# Simrad_parsers treat this as uint8, but I think it should be signed int8
+def calc_angles(angles):
     '''Convert angles as returned by EK60 to standard angles.'''
-    return None
+    return angles*180/128 # INDEX2ELEC in pyEcholab
 
