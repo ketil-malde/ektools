@@ -6,10 +6,8 @@ NODECODE=True
 
 if NODECODE:
     import util.simrad_parsers as sp
-    import util.simrad_raw_file as raw
 else:
     import echolab2.instruments.util.simrad_parsers as sp
-    import echolab2.instruments.util.simrad_raw_file as raw
 
 # text colors: GREEN = '\033[92m', BLUE = '\033[94m', HEADER = '\033[95m', CYAN = '\033[96m', BOLD = '\033[1m', UNDERLINE = '\033[4m'
 #              CLEAR = '\033[0m', YELLOW = '\033[93m', RED = '\033[91m'
