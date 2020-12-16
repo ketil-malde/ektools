@@ -2,12 +2,7 @@ import sys
 import struct
 import mmap
 
-NODECODE=True
-
-if NODECODE:
-    import util.simrad_parsers as sp
-else:
-    import echolab2.instruments.util.simrad_parsers as sp
+import util.simrad_parsers as sp
 
 # text colors: GREEN = '\033[92m', BLUE = '\033[94m', HEADER = '\033[95m', CYAN = '\033[96m', BOLD = '\033[1m', UNDERLINE = '\033[4m'
 #              CLEAR = '\033[0m', YELLOW = '\033[93m', RED = '\033[91m'

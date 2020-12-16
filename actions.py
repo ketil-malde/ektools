@@ -41,22 +41,29 @@ def rawinfo():
     def ri(obj):
         if obj is None:
             return
-        elif obj['type'] == 'CON0':
+        elif obj['type'] == b'CON0':
             # store config for each channel by frequency
             cf = obj['configuration']
             for transp in cf:
                 tcf = cf[transp]
                 config[tcf['frequency']] = tcf
-        elif obj['type'][:3] == 'RAW':
-            print('s_v:   ', type3_convert(config[obj['frequency']], obj))
-            print('angle:', obj['angle'])
+        elif obj['type'][:3] == b'RAW':
+            rng, s_v = type3_convert(config[obj['frequency']], obj)
+            a   = angle_convert(obj['angle'])
+            print('range:'  , rng[:20])
+            print('s_v:'    , s_v[:20])
+            print('angle 1:', a[:20,0])
+            print('angle 2:', a[:20,1])
             # adjust for: heave, transducer_depth
             # convert the angles?
             # keep timestamp, frequency, temperature, ...and?
     return ri
 
-from conversion import calc_sv
+from conversion import calc_sv, calc_angles, calc_range
 import numpy as np
+
+def angle_convert(angs):
+    return calc_angles(angs)
 
 def type3_convert(cnf, obj):
     '''Converting raw power to s_v using Type 3 definition from the NetCDF standard'''
@@ -64,21 +71,29 @@ def type3_convert(cnf, obj):
     # obj[pulse_length] has float, and accuracy loss means approximate search
     idx = np.where((cnf['pulse_length_table']-obj['pulse_length'])**2 < 0.0001**2)[0][0]
     sa_corr = cnf['sa_correction_table'][idx]
-    # check that this also corresponds to gain?
+    # check that this also corresponds to gain:
     assert((cnf['gain_table'][idx]-cnf['gain'])**2 < 0.0001)
+
+    rng = calc_range(
+        P_c          =  obj['power'],
+        sound_vel    =  obj['sound_velocity'],
+        sample_interval = obj['sample_interval']         # transducer sampling rate
+    )
     
-    return calc_sv(
+    sv = calc_sv(
+        Rng             = rng,
         P_c             = obj['power'],                   # vector of power received
         alpha           = obj['absorption_coefficient'],  # acoustic attenuation
         pt              = obj['transmit_power'],          # transducer power
         sound_vel       = obj['sound_velocity'],          # speed of sound
         wavelen         = obj['sound_velocity'] / obj['frequency'],  # wavelength
         transducer_gain = cnf['gain'],                    # G0 in Type 3.
-        sample_interval = obj['sample_interval'],         # transducer sampling rate
         eq_beam_angle   = cnf['equivalent_beam_angle'],   # ?
         pulse_length    = obj['pulse_length'],            # lenght of each ping
         sa_corr         = sa_corr
     )
+
+    return rng, sv
 
 def summarize():
     s = {}
