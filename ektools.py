@@ -2,8 +2,6 @@ import sys
 import struct
 import mmap
 
-import util.simrad_parsers as sp
-
 # text colors: GREEN = '\033[92m', BLUE = '\033[94m', HEADER = '\033[95m', CYAN = '\033[96m', BOLD = '\033[1m', UNDERLINE = '\033[4m'
 #              CLEAR = '\033[0m', YELLOW = '\033[93m', RED = '\033[91m'
 
@@ -13,6 +11,7 @@ def warn(*args, **kwargs):
 def error(*args, **kwargs):
     print('\033[91mError:\033[0m',*args, file=sys.stderr, **kwargs)
 
+import util.simrad_parsers as sp
 def parse(str):
     '''Table for selecting the correct parser to use for datagrams'''
     # duplicates the simrad_raw_file.DGRAM_TYPE_KEY, but with bytestring keys
