@@ -27,7 +27,10 @@ def genmeta(f):
     heaves = []
     rolls = []
     pitch = []
-
+    # EK80 does these differently    
+    sound_speed = None  
+    temperatures = []
+    
     for pos, typ, ln, bstr in index(f):
         obj = parse(bstr)
         if starttime is None:
@@ -39,10 +42,12 @@ def genmeta(f):
                 tsp = obj['configuration'][tspname]
                 fq = int(tsp['frequency'])
                 rcounts[fq] = { 'transducer': tspname, 'pings': 0, 'ranges': [] }
+
+                snm = tsp['survey_name'].decode('latin-1')
                 if survey_name is None:
-                    survey_name = tsp['survey_name']
+                    survey_name = snm
                 else:
-                    assert survey_name == tsp['survey_name']
+                    assert survey_name == snm
 
         elif typ == 'NME0':
             msg = nm.parse(obj['nmea_string'])
@@ -72,11 +77,47 @@ def genmeta(f):
             rolls.append(obj['roll'])
             pitch.append(obj['pitch'])
 
+        # EK80 Configuration
+        elif typ == 'XML0':
+            if obj['subtype'] == 'configuration':
+                for tspname in obj['configuration']:
+                    tsp = obj['configuration'][tspname]
+                    fq = int(tsp['transducer_frequency'])
+                    # count using transducer name, not frequency
+                    rcounts[tspname] = { 'frequency': fq, 'pings': 0, 'ranges': [] }
+
+            elif obj['subtype'] == 'parameter':
+                tspname = obj['parameter']['channel_id']
+                rcounts[tspname]['sample_interval'] = obj['parameter']['sample_interval']
+                # collect more interesting info here?
+
+            elif obj['subtype'] == 'environment':
+                env = obj['environment']
+                sound_speed = env['sound_speed']
+                temperatures.append(env['temperature'])
+
+        elif typ == 'MRU0':
+            heaves.append(obj['heave'])
+            rolls.append(obj['roll'])
+            pitch.append(obj['pitch'])
+
+        elif typ == 'RAW3':
+            tspname = obj['channel_id'].decode('ascii')
+            rc = rcounts[tspname]
+            rc['pings'] += 1
+            # todo: deal with the different kinds of formats
+            rng = round(len(obj['complex'])*rcounts[tspname]['sample_interval']*sound_speed)  # obj['sound_velocity']) <- sigh: environment
+            if rng not in rc['ranges']:
+                rc['ranges'].append(rng)
+            
     def minavgmax(ls):
-        return (min(ls), sum(ls)/len(ls), max(ls))
+        if ls == []:
+            return None
+        else:
+            return (min(ls), sum(ls)/len(ls), max(ls))
 
     return { 'filename': filename, 'sha1sum': sha1sum,
-             'survey': survey_name.decode('latin-1'),
+             'survey': survey_name,
              'transponders': rcounts,
              'start_time': starttime, 'end_time': endtime,
              'start_position': startpos, 'end_position' : endpos,
