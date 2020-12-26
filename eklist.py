@@ -38,13 +38,14 @@ if __name__ == '__main__':
     actions = []
     if args.check:     actions.append(act.checkdate())
     if args.summarize: actions.append(act.summarize())
-    if args.rawinfo:   actions.append(act.rawinfo())
+
     if args.list:
         if args.quiet:
             error('Please specify at most one of -l and -q')
             exit(-1)
         else:
             actions.append(act.showdict)
+    if args.rawinfo:   actions.append(act.rawinfo())
 
     fs = []
     if args.type: fs.append(act.filtertype(args.type))
