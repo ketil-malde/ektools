@@ -315,7 +315,7 @@ class SimradAnnotationParser(_SimradDatagramParser):
                      ]
                 }
 
-        _SimradDatagramParser.__init__(self, "TAG", headers)
+        _SimradDatagramParser.__init__(self, b'TAG', headers)
 
 
     def _unpack_contents(self, raw_string, bytes_read, version):
@@ -680,7 +680,7 @@ class SimradXMLParser(_SimradDatagramParser):
                             ]
                         }
 
-        _SimradDatagramParser.__init__(self, b"XML", headers)
+        _SimradDatagramParser.__init__(self, b'XML', headers)
 
 
     def _unpack_contents(self, raw_string, bytes_read, version):
