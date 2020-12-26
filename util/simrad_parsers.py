@@ -193,8 +193,7 @@ class SimradDepthParser(_SimradDatagramParser):
 
             if len(set(lengths)) != 1:
                 min_indx = min(lengths)
-                log.warning('Data lengths mismatched:  d:%d, r:%d, u:%d, t:%d',
-                    *lengths)
+                log.warning('Data lengths mismatched:  d:%d, r:%d, u:%d, t:%d', *lengths)
                 log.warning('  Using minimum value:  %d', min_indx)
                 data['transceiver_count'] = min_indx
 
@@ -1609,17 +1608,14 @@ class SimradRawParser(_SimradDatagramParser):
 
                 #  unpack the complex samples
                 if (data['n_complex'] > 0):
-                    #  determine the block size (complex data are comprised
-                    #  of two values so we have to double this)
+                    #  determine the block size (complex data are comprised of two values so we have to double this)
                     block_size = 2 * data['count'] * data['n_complex'] * type_bytes
 
                     #  convert and reshape the raw string data
-                    data['complex'] = np.frombuffer(raw_string[indx:indx + block_size],
-                            dtype=data['complex_dtype'])
-                    #data['complex'] = np.fromstring(raw_string[indx:indx + block_size],
-                    #        dtype=data['complex_dtype'])
+                    data['complex'] = np.frombuffer(raw_string[indx:indx + block_size], dtype=data['complex_dtype'])
                     data['complex'].shape = (data['count'], 2 * data['n_complex'])
                     data['complex'].dtype = np.complex64
+                    # ^- can you do this??!
                 else:
                     data['complex'] = None
 
