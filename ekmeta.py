@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-from ektools import parse, index
+from ektools import parse, index, warn, error
 
 import datetime
 import hashlib
@@ -50,29 +50,33 @@ def genmeta(f):
                     assert survey_name == snm
 
         elif typ == 'NME0':
-            msg = nm.parse(obj['nmea_string'])
-            msg_t = msg.sentence_type
-            if msg_t == 'GGA':
-                if startpos is None:
-                    startpos = (msg.latitude, msg.longitude)
-                endpos = (msg.latitude, msg.longitude)
-            elif msg_t == 'VTG':
-                speeds.append(float(msg.spd_over_grnd_kts))
-            elif msg_t == 'ZDA':
-                dt = obj['timestamp']
-                t = msg.timestamp
-                gps_t = datetime.datetime(msg.year, msg.month, msg.day,
-                            t.hour, t.minute, t.second, t.microsecond)
-                timedeltas.append((dt-gps_t).total_seconds())
-            # collect start point, end point, average speed, clock error/offset
+            try:
+                msg = nm.parse(obj['nmea_string'])
+                msg_t = msg.sentence_type
+            except:
+                warn("Couldn't parse NMEA datagram at ", pos)
+            else:
+                if msg_t == 'GGA':
+                    if startpos is None:
+                        startpos = (msg.latitude, msg.longitude)
+                    endpos = (msg.latitude, msg.longitude)
+                elif msg_t == 'VTG':
+                    speeds.append(float(msg.spd_over_grnd_kts))
+                elif msg_t == 'ZDA':
+                    dt = obj['timestamp']
+                    t = msg.timestamp
+                    gps_t = datetime.datetime(msg.year, msg.month, msg.day,
+                                              t.hour, t.minute, t.second, t.microsecond)
+                    timedeltas.append((dt-gps_t).total_seconds())
 
         elif typ == 'RAW0':
             fq = obj['frequency']
             rc = rcounts[fq]
             rc['pings'] = rc['pings']+1
-            rng = round(len(obj['power'])*obj['sample_interval']*obj['sound_velocity'])
-            if rng not in rc['ranges']:
-                rc['ranges'].append(rng)
+            if obj['power'] is not None:
+                rng = round(len(obj['power'])*obj['sample_interval']*obj['sound_velocity'])
+                if rng not in rc['ranges']:
+                    rc['ranges'].append(rng)
             heaves.append(obj['heave'])
             rolls.append(obj['roll'])
             pitch.append(obj['pitch'])
@@ -106,9 +110,10 @@ def genmeta(f):
             rc = rcounts[tspname]
             rc['pings'] += 1
             # todo: deal with the different kinds of formats
-            rng = round(len(obj['complex'])*rcounts[tspname]['sample_interval']*sound_speed)  # obj['sound_velocity']) <- sigh: environment
-            if rng not in rc['ranges']:
-                rc['ranges'].append(rng)
+            if obj['complex'] is not None:
+                rng = round(len(obj['complex'])*rcounts[tspname]['sample_interval']*sound_speed)  # obj['sound_velocity']) <- sigh: environment
+                if rng not in rc['ranges']:
+                    rc['ranges'].append(rng)
             
     def minavgmax(ls):
         if ls == []:
