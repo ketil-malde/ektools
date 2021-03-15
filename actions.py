@@ -36,7 +36,9 @@ def showdict(obj, indent=4):
         else:
             print(indent*' ', k, repr(obj[k])[:72])
 
-def rawinfo():
+import pickle
+
+def rawdump():
     config = {}
     def ri(obj):
         if obj is None:
@@ -50,12 +52,9 @@ def rawinfo():
         elif obj['type'][:3] == b'RAW':
             rng, s_v = type3_convert(config[obj['frequency']], obj)
             a   = angle_convert(obj['angle'])
-            print('range:'  , rng[:20])
-            print('s_v:'    , s_v[:20])
-            print('angle 1:', a[:20,0])
-            print('angle 2:', a[:20,1])
+            raw = {'timestamp' : obj['timestamp'], 'frequency' : obj['frequency'], 'range' : rng, 's_v' : s_v, 'angles' : a}
+            print(pickle.dumps(raw), flush=True)
             # adjust for: heave, transducer_depth
-            # convert the angles?
             # keep timestamp, frequency, temperature, ...and?
     return ri
 

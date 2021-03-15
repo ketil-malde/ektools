@@ -31,7 +31,7 @@ if __name__ == '__main__':
     p.add_argument('-s', '--summarize', action='store_true', help='summarize datagrams')
     p.add_argument('-q', '--quiet', action='store_true', help='produce minimal output')
     p.add_argument('-c', '--check', action='store_true', help='check datagram contents for consistency')
-    p.add_argument('-r', '--rawinfo', action='store_true', help='info on raw datagrams')
+    p.add_argument('-r', '--rawdump', action='store_true', help='dump pickled raw datagrams')
     p.add_argument('FILE', nargs='+', help='input files in RAW format.')
     args = p.parse_args()
     
@@ -45,7 +45,7 @@ if __name__ == '__main__':
             exit(-1)
         else:
             actions.append(act.showdict)
-    if args.rawinfo:   actions.append(act.rawinfo())
+    if args.rawdump:   actions.append(act.rawdump())
 
     fs = []
     if args.type: fs.append(act.filtertype(args.type))
