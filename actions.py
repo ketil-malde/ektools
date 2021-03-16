@@ -41,6 +41,9 @@ import sys
 
 def rawdump():
     config = {}
+    current = []
+    cur_time = None
+
     def ri(obj):
         if obj is None:
             return
@@ -53,8 +56,18 @@ def rawdump():
         elif obj['type'][:3] == b'RAW':
             rng, s_v = type3_convert(config[obj['frequency']], obj)
             a   = angle_convert(obj['angle'])
-            raw = {'timestamp' : obj['timestamp'], 'frequency' : obj['frequency'], 'range' : rng, 's_v' : s_v, 'angles' : a}
-            sys.stdout.buffer.write(pickle.dumps(raw))
+            my_time = obj['timestamp']
+
+            nonlocal cur_time, current
+            if cur_time == None: cur_time = my_time
+
+            if cur_time != my_time:
+                sys.stdout.buffer.write(pickle.dumps({cur_time : current}))
+                current = []
+                cur_time = my_time
+
+            current.append({obj['frequency'] : { 'range' : rng, 's_v' : s_v, 'angles' : a }})
+
             # adjust for: heave, transducer_depth
             # keep timestamp, frequency, temperature, ...and?
     return ri

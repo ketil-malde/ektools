@@ -1,3 +1,4 @@
+#/usr/bin/python3
 
 import pickle
 import sys
@@ -10,5 +11,5 @@ def unpickle_iter():
         raise StopIteration
 
 for r in unpickle_iter():    
-    print(r['timestamp'], r['frequency'])
+    print(r.keys())
 
