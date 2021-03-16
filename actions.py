@@ -37,6 +37,7 @@ def showdict(obj, indent=4):
             print(indent*' ', k, repr(obj[k])[:72])
 
 import pickle
+import sys
 
 def rawdump():
     config = {}
@@ -53,7 +54,7 @@ def rawdump():
             rng, s_v = type3_convert(config[obj['frequency']], obj)
             a   = angle_convert(obj['angle'])
             raw = {'timestamp' : obj['timestamp'], 'frequency' : obj['frequency'], 'range' : rng, 's_v' : s_v, 'angles' : a}
-            print(pickle.dumps(raw), flush=True)
+            sys.stdout.buffer.write(pickle.dumps(raw))
             # adjust for: heave, transducer_depth
             # keep timestamp, frequency, temperature, ...and?
     return ri
