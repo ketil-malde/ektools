@@ -36,8 +36,6 @@ if __name__ == '__main__':
     args = p.parse_args()
     
     actions = []
-    if args.check:     actions.append(act.checkdate())
-    if args.summarize: actions.append(act.summarize())
 
     if args.list:
         if args.quiet:
@@ -45,10 +43,16 @@ if __name__ == '__main__':
             exit(-1)
         else:
             actions.append(act.showdict)
-    if args.rawdump:   actions.append(act.rawdump())
+    if args.rawdump:
+        actions = [act.rawdump()] # override previous
+        args.quiet = True
+        if args.list: warn("Ignoring '-l' because '-r' was specified.")
 
     fs = []
     if args.type: fs.append(act.filtertype(args.type))
+
+    if args.check:     actions.append(act.checkdate())
+    if args.summarize: actions.append(act.summarize())
     
     for f in args.FILE:
         # print(f)
