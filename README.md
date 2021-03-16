@@ -21,6 +21,14 @@ other output (`-q`):
 
 	eklist -qc file.raw
 
+Dump normalized (converted to s_v and with corrected angles) RAW data
+in a binary stream to stdout:
+
+    eklist -qr file.raw
+	
+The `rawdecode.py` program demonstrates how to read the stream back in
+again.
+
 # Structure
 
 The `eklist` program mainly parses the input and processes it with a
