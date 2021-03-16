@@ -41,7 +41,7 @@ import sys
 
 def rawdump():
     config = {}
-    current = []
+    current = {}
     cur_time = None
 
     def ri(obj):
@@ -63,10 +63,10 @@ def rawdump():
 
             if cur_time != my_time:
                 sys.stdout.buffer.write(pickle.dumps({cur_time : current}))
-                current = []
+                current = {}
                 cur_time = my_time
 
-            current.append({obj['frequency'] : { 'range' : rng, 's_v' : s_v, 'angles' : a }})
+            current[obj['frequency']] = { 'range' : rng, 's_v' : s_v, 'angles' : a }
 
             # adjust for: heave, transducer_depth
             # keep timestamp, frequency, temperature, ...and?

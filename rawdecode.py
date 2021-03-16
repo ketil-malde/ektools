@@ -10,6 +10,7 @@ def unpickle_iter():
     except EOFError:
         raise StopIteration
 
-for r in unpickle_iter():    
-    print(r.keys())
+for r in unpickle_iter():
+    for dt,fs in r.items():
+        print(dt, fs.keys())
 
