@@ -1,6 +1,6 @@
 # Actions to take
 from datetime import datetime
-from ektools import warn, error
+from util.ektools import warn, error
 
 def checkdate():
     zeros = 0
@@ -75,7 +75,7 @@ def rawdump():
             # keep timestamp, frequency, temperature, ...and?
     return ri
 
-from conversion import calc_sv, calc_angles, calc_range
+from util.conversion import calc_sv, calc_angles, calc_range
 import numpy as np
 
 def angle_convert(angs):

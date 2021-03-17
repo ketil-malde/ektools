@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-from ektools import parse, index, warn, error
+from util.ektools import parse, index, warn, error
 
 import datetime
 import hashlib
