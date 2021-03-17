@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-import sys
+# import cProfile
 
 import actions as act
 from ektools import warn, error, parse, index
@@ -57,4 +57,5 @@ if __name__ == '__main__':
     for f in args.FILE:
         # print(f)
         d = index(f)
+        # cProfile.run("process(d, verbose=not args.quiet, actions=actions, filters=fs)")
         process(d, verbose=not args.quiet, actions=actions, filters=fs)
