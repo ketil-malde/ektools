@@ -45,7 +45,10 @@ def rawdump():
     cur_time = None
 
     def ri(obj):
+        nonlocal cur_time, current
         if obj is None:
+            if cur_time != None:
+                sys.stdout.buffer.write(pickle.dumps({cur_time : current}))
             return
         elif obj['type'] == b'CON0':
             # store config for each channel by frequency
@@ -58,9 +61,9 @@ def rawdump():
             a   = angle_convert(obj['angle'])
             my_time = obj['timestamp']
 
-            nonlocal cur_time, current
             if cur_time == None: cur_time = my_time
 
+            # if we receive a new time, dump what output we have, and start a new ping
             if cur_time != my_time:
                 sys.stdout.buffer.write(pickle.dumps({cur_time : current}))
                 current = {}
