@@ -15,7 +15,7 @@ def heatmap2d(arr: np.ndarray):
     plt.colorbar()
     plt.show()
     
-from ektools import index, parse, error
+from util.ektools import index, parse, error
 
 if __name__ == '__main__':
 

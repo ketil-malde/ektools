@@ -2,8 +2,8 @@
 
 import sys
 
-import actions as act
-from ektools import warn, error, parse, index
+import util.actions as act
+from util.ektools import warn, error, parse, index
 
 def process(df, verbose=False, filters=[], actions=[]):
     '''Process an indexed Simrad RAW file by applying a set of actions'''
