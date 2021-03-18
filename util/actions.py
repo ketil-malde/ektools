@@ -66,11 +66,17 @@ def rawdump():
 
             # if we receive a new time, dump what output we have, and start a new ping
             if cur_time != my_time:
+                # check that all mrus match
+                mrus = [ x['mru'] for k,x in current.items()]
+                if not all([x == mrus[0] for x in mrus]):
+                    warn("MRUs with same timestamp differ")
                 sys.stdout.buffer.write(pickle.dumps({cur_time : current}))
                 current = {}
                 cur_time = my_time
 
-            current[obj['frequency']] = { 'range' : rng, 's_v' : s_v, 'angles' : a }
+            # should mru be for each ping, along with date?
+            mru = { 'heave' : obj['heave'], 'roll' : obj['roll'], 'pitch' : obj['pitch'] }
+            current[obj['frequency']] = { 'range' : rng, 's_v' : s_v, 'angles' : a, 'mru' : mru }
 
             # adjust for: heave, transducer_depth
             # keep timestamp, frequency, temperature, ...and?
