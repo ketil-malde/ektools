@@ -62,6 +62,7 @@ def rawdump():
             my_time = obj['timestamp']
 
             if cur_time == None: cur_time = my_time
+            if my_time < cur_time: warn("New timestamp",my_time, "is earlier than previously seen",cur_time)
 
             # if we receive a new time, dump what output we have, and start a new ping
             if cur_time != my_time:
