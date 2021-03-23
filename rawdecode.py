@@ -11,11 +11,12 @@ def unpickle_iter():
         # raise StopIteration
         return
 
-for r in unpickle_iter():
-    for dt,fs in r.items():
-        print(dt,fs.keys())
-        for f in fs:
-            # print(f, fs[f]['mru'])
-            print(f)
+if __name__ == '__main__':
+    for r in unpickle_iter():
+        for datetime,freqs in r.items():
+            print(datetime,freqs.keys())
+            for f in freqs:
+                # print(f, fs[f]['mru'])
+                print(f)
 
 
