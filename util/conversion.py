@@ -48,6 +48,8 @@ def calc_range(P_c, sound_vel, sample_interval):
     return Rng
 
 # Simrad_parsers treat this as uint8, but I think it should be signed int8
+# Angles outside beam width are (probably) noise
+# maybe use radians for trig compat
 def calc_angles(angles):
     '''Convert angles as returned by EK60 to standard angles.'''
     return angles*180/128 # INDEX2ELEC in pyEcholab

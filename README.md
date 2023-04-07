@@ -36,5 +36,5 @@ user-selected set of functions, defined in `actions.py`.  Of
 particular interest is the function `type3_convert()`, which converts
 from the native RAW format, to standard /sv/ values.
 
-The parsers for individual datagram is taken from PyEchoLab, and can
+The parsers for individual datagrams are taken from PyEchoLab, and can
 be found in the `util` subdirectory.

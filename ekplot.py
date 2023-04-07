@@ -17,6 +17,7 @@ def heatmap2d(arr: np.ndarray):
     
 from util.ektools import index, parse, error
 
+#########################################
 if __name__ == '__main__':
 
     import argparse
@@ -49,4 +50,4 @@ if __name__ == '__main__':
     # TODO:
     # - match timestamps
     # - include frequency
-
+    # - plot angles?

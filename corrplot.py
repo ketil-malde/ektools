@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+# Usage: python3 eklist.py -r ../ekdata/2014813-D20180628-T202307.raw| python3 corrplot.py
 
 from rawdecode import unpickle_iter
 
