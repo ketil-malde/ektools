@@ -26,21 +26,32 @@ for r in unpickle_iter():
     pingdata = {}
     for datetime, freqs in r.items():
         print(datetime,freqs.keys())
-        for f,v in freqs.items():
+        for fq,v in freqs.items():
+            f = str(fq)
             l = len(v['range'])
             if l not in pingdata.keys():
                 pingdata[l] = {}
             if f not in pingdata[l].keys():
+#                pingdata[l][f+'range'] = np.empty(0)
+                pingdata[l][f+'alpha'] = np.empty(0)
+                pingdata[l][f+'beta'] = np.empty(0)
                 pingdata[l][f] = np.empty(0)
-            pingdata[l][f] = np.append(pingdata[l][f], v['angles'][:,0])
 
-print(pingdata.keys())
-for l in pingdata.keys():
-    ping = pd.DataFrame.from_records(pingdata[l])
-    print(ping)
-    g = sns.PairGrid(ping, aspect=1.4, diag_sharey=False)
-    g.map_lower(sns.regplot, lowess=True, ci=False, line_kws={'color': 'black'})
-    g.map_diag(sns.distplot, kde_kws={'color': 'black'})
-    g.map_upper(corrdot)
-    plt.show()
+            cutoff=30
+                
+            x = np.log(v['s_v']) # v['angles'][:,0]
+            pingdata[l][f]    = np.append(pingdata[l][f], x[cutoff:])
+#            pingdata[l][f+'range'] = np.append(pingdata[l][f+'range'], v['range'])
+            pingdata[l][f+'alpha'] = np.append(pingdata[l][f+'alpha'], v['angles'][cutoff:,0])
+            pingdata[l][f+'beta']  = np.append(pingdata[l][f+'beta'], v['angles'][cutoff:,1])
+
+    print(pingdata.keys())
+    for l in pingdata.keys():
+        ping = pd.DataFrame.from_records(pingdata[l])
+        print(ping)
+        g = sns.PairGrid(ping, aspect=1.4, diag_sharey=False)
+        g.map_lower(sns.regplot, lowess=True, ci=False, line_kws={'color': 'black'}, marker='.', scatter_kws={'s':2})
+        g.map_diag(sns.histplot, kde_kws={'color': 'black'})
+        g.map_upper(corrdot)
+        plt.show()
 

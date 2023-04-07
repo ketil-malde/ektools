@@ -121,21 +121,23 @@ def genmeta(f):
         else:
             return (min(ls), sum(ls)/len(ls), max(ls))
 
-    return { 'filename': filename, 'sha1sum': sha1sum,
-             'survey': survey_name,
-             'transponders': rcounts,
-             'start_time': starttime, 'end_time': endtime,
-             'start_position': startpos, 'end_position' : endpos,
-             'vessel_speed': minavgmax(speeds),
-             'heave': minavgmax(heaves), 'roll': minavgmax(rolls),
-             'pitch': minavgmax(pitch),
-             'clock_error' : minavgmax(timedeltas)
+    return { filename : {
+        'sha1sum': sha1sum,
+        'survey': survey_name,
+        'transponders': rcounts,
+        'start_time': starttime, 'end_time': endtime,
+        'start_position': startpos, 'end_position' : endpos,
+        'vessel_speed': minavgmax(speeds),
+        'heave': minavgmax(heaves), 'roll': minavgmax(rolls),
+        'pitch': minavgmax(pitch),
+        'clock_error' : minavgmax(timedeltas)
+        }
     }
 
 if __name__ == '__main__':
 
     import argparse
-    from actions import showdict
+    from util.actions import showdict
 
     p = argparse.ArgumentParser(description='Generate metadata from Simrad RAW files.')
     # p.add_argument()
@@ -143,4 +145,5 @@ if __name__ == '__main__':
     args = p.parse_args()
 
     for f in args.FILE:
-        showdict(genmeta(f))
+        showdict(genmeta(f), indent=0)
+        print()
