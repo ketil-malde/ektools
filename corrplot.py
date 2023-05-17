@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 # Usage: python3 eklist.py -r ../ekdata/2014813-D20180628-T202307.raw| python3 corrplot.py
+# TODO: eklist output TS instead of Sv - filter?
 
 from rawdecode import unpickle_iter
 
@@ -38,7 +39,7 @@ for r in unpickle_iter():
                 pingdata[l][f] = np.empty(0)
 
             cutoff=30
-                
+
             x = np.log(v['s_v']) # v['angles'][:,0]
             pingdata[l][f]    = np.append(pingdata[l][f], x[cutoff:])
 #            pingdata[l][f+'range'] = np.append(pingdata[l][f+'range'], v['range'])
@@ -47,7 +48,21 @@ for r in unpickle_iter():
 
     print(pingdata.keys())
     for l in pingdata.keys():
-        ping = pd.DataFrame.from_records(pingdata[l])
+        # try to filter on average sv value
+        num = 0
+        sumsv = np.zeros(l-30)
+        for fq in pingdata[l]:
+            if fq[-1] == 'a':  # avoid angles
+                continue
+            num +=1
+            sumsv = sumsv + pingdata[l][fq]
+        filterx = sumsv/num > -15
+        p = {}
+        for fq in pingdata[l]:
+            p[fq] = pingdata[l][fq][filterx]
+            print('len before:', len(pingdata[l][fq]), ' len after:', len(p[fq]))
+
+        ping = pd.DataFrame.from_records(p)
         print(ping)
         g = sns.PairGrid(ping, aspect=1.4, diag_sharey=False)
         g.map_lower(sns.regplot, lowess=True, ci=False, line_kws={'color': 'black'}, marker='.', scatter_kws={'s':2})
