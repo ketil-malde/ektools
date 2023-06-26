@@ -13,7 +13,7 @@ def process(df, verbose=False, filters=[], actions=[]):
             print(f'Datagram {count}:\t{pos}\t{l}\t{t}')
         count += 1
         if actions:
-            if not filters or any(f(pos,t,l) for f in filters):
+            if filters == [] or any(f(pos,t,l) for f in filters):
                 obj = parse(bstr)
                 for a in actions:
                     a(obj)
