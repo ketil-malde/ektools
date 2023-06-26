@@ -3,7 +3,7 @@ import numpy as np
 
 DEBUG = False
 
-def calc_sv(Rng, P_c, alpha, pt, sound_vel, wavelen, transducer_gain, eq_beam_angle, pulse_length, sa_corr):
+def calc_sv(Rng, P_c, alpha, pt, sound_vel, wavelen, transducer_gain, eq_beam_angle, pulse_length, sa_corr, output='sv'):
     '''Converting EK60 raw power to s_v using Type 3 definition from the NetCDF standard'''
     # capitalized variables are vectors, lower case are scalars
 
@@ -22,12 +22,20 @@ def calc_sv(Rng, P_c, alpha, pt, sound_vel, wavelen, transducer_gain, eq_beam_an
 
     Absorption = 2*alpha*Rng
 
-    # TS = P_received + 2*TVG + Absorption - 10*log10(gain) - 2*transducer_gain
-    Sv = P_received + TVG + Absorption - 10*log10 (gain * sound_vel * 10**(eq_beam_angle/10) * pulse_duration /2) - 2*transducer_gain
-    if DEBUG: print('Sv:', Sv[:50])
-    sv = 10**(Sv/10)
-
-    return sv
+    if output == 'TS':
+        TS = P_received + 2*TVG + Absorption - 10*log10(gain) - 2*transducer_gain
+        return TS
+    else:
+        Sv = P_received + TVG + Absorption - 10*log10 (gain * sound_vel * 10**(eq_beam_angle/10) * pulse_duration /2) - 2*transducer_gain
+        if DEBUG: print('Sv:', Sv[:50])
+        if output == 'Sv':
+            return Sv
+        elif output == 'sv':
+            sv = 10**(Sv/10)
+            return sv
+        else:
+            print('Error: calc_sv, illegal output mode: "',output,'"')
+            exit -1
 
 def calc_range(P_c, sound_vel, sample_interval):
     # Range is sample interval times the speed of sound.  In pyEcholab, it starts with two extra zeros, due to "receiver delay" (line 1563, EK60.py).
