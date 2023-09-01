@@ -32,7 +32,7 @@ def parse(str):
     return(p.from_string(str, len(str)))
 
 def index(f):
-    '''Build an index of datagrams in a Simrad RAW file'''
+    '''Build an index of datagrams in a Simrad RAW file.  This is a list of position, type, length, and (unparsed) contents.'''
     idx = []
     with open(f, "rb") as fh:
         with mmap.mmap(fh.fileno(), length=0, access=mmap.ACCESS_READ) as mf:
