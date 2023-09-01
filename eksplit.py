@@ -10,36 +10,46 @@ idx = index(fn)
 config = parse(idx[0][3])
 
 assert config['subtype'] == 'configuration'
-freqs = config['configuration'].keys()
+confs = set([ k.split('_')[-1] for k in config['configuration'].keys()])
+print('Configurations:', confs)
 
-def matches(ch,msg):
+def matches(predicate, msg):
     p = parse(msg)
     if 'channel_id' in p.keys():
-        return p['channel_id'].decode() == ch
+        return predicate(p['channel_id'].decode())
     elif 'parameter' in p.keys():
-        return p['parameter']['channel_id'] == ch
+        return predicate(p['parameter']['channel_id'])
     else:
         return True
 
 def dgram_write(f, dgram):
     """Write a datagram to a file"""
-            hdr = struct.pack('<l',len(dgram))
-            f.write(hdr)
-            f.write(dgram)
-            f.write(hdr)
+    hdr = struct.pack('<l',len(dgram))
+    f.write(hdr)
+    f.write(dgram)
+    f.write(hdr)
 
-def edit_xml(ch, xmlstr):
+import lxml.etree as et
+
+def edit_xml(predicate, xmlstr):
     """Remove all except channel ch from XML configuration"""
     # remove all channels not matching ch
-    # remove empty <Transceiver> elements
-    pass
-            
-split = {}
-for a in freqs:
-    split[a] = [(p,t,l,m) for p,t,l,m in index(fn) if matches(a,m)]
+    xml = et.fromstring(xmlstr)
+    for trans in xml.findall('.//Transceiver'):
+        for ch in trans.findall('.//Channel'):
+            if not predicate(ch.get('ChannelID')):
+                ch.getparent().remove(ch)
+        if len(trans.findall('.//Channel')) == 0:
+            trans.getparent().remove(trans)
 
-for a in freqs:
-    print(f'Freq {a}, count: {len(split[a])}')
+    return xml
+
+split = {}
+for a in confs:
+    split[a] = [(p,t,l,m) for p,t,l,m in index(fn) if matches(lambda c : c.split('_')[-1] == a, m)]
+
+for a in confs:
+    print(f'Config {a}, count: {len(split[a])}')
     counts = {}
     for x in split[a]:
         if x[1] not in counts:
@@ -47,9 +57,15 @@ for a in freqs:
         else:
             counts[x[1]]+=1
     print(counts)
+
     outname = os.path.splitext(os.path.basename(fn))[0]+'_'+a+'.raw'
     with open(outname, 'wb') as f:
-        for (pos,typ,length,dgram) in split[a]:
+        # Output configuration datagram
+        xmlconf = idx[0][3][12:-2]
+        x0 = et.tostring(edit_xml(lambda c: c.split('_')[-1]==a, xmlconf))
+        dgram_write(f,split[a][0][3][:12]+x0)
+
+        for (pos,typ,length,dgram) in split[a][1:]:
             # write length (dgram already contains type)
             dgram_write(f,dgram)
         
