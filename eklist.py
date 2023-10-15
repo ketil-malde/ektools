@@ -14,9 +14,12 @@ def process(df, verbose=False, filters=[], actions=[]):
         count += 1
         if actions:
             if filters == [] or any(f(pos,t,l) for f in filters):
-                obj = parse(bstr)
-                for a in actions:
-                    a(obj)
+                try:
+                    obj = parse(bstr)
+                    for a in actions:
+                        a(obj)
+                except:
+                    warn(f'Don\'t know how/failure to parse datagram of type {t}')
     # signal end
     for a in actions:
         a(None)

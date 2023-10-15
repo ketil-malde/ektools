@@ -13,7 +13,8 @@ def error(*args, **kwargs):
 
 import util.simrad_parsers as sp
 def parse(str):
-    '''Table for selecting the correct parser to use for datagrams'''
+    '''Table for selecting the correct parser to use for datagrams.
+       Throws an exception if the datagram isn't known.'''
     # duplicates the simrad_raw_file.DGRAM_TYPE_KEY, but with bytestring keys
     parsers = {
           b'BOT' : sp.SimradBottomParser()
