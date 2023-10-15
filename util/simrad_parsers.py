@@ -1707,6 +1707,15 @@ class SimradRawParser(_SimradDatagramParser):
                         ('spare', '2s'),
                         ('offset', 'l'),
                         ('count', 'l')
+                        ],
+                    4 : [('type', '4s'),
+                        ('low_date', 'L'),
+                        ('high_date', 'L'),
+                        ('channel_id', '128s'),
+                        ('data_type', 'h'),
+                        ('spare', '2s'),
+                        ('offset', 'l'),
+                        ('count', 'l')
                         ]
                     }
         _SimradDatagramParser.__init__(self, b'RAW', headers)
@@ -1746,7 +1755,7 @@ class SimradRawParser(_SimradDatagramParser):
                 data['power'] = np.empty((0,), dtype='int16')
                 data['angle'] = np.empty((0,), dtype='int8')
 
-        elif version == 3:
+        elif version == 3 or version == 4:
 
             #  clean up the channel ID
             data['channel_id'] = data['channel_id'].strip(b'\x00')
@@ -1787,7 +1796,8 @@ class SimradRawParser(_SimradDatagramParser):
 
                 #  unpack the complex samples
                 if (data['n_complex'] > 0):
-                    #  determine the block size (complex data are comprised of two values so we have to double this)
+                    #  determine the block size (complex data are comprised
+                    # of two values so we have to double this)
                     block_size = 2 * data['count'] * data['n_complex'] * type_bytes
 
                     #  convert and reshape the raw string data
@@ -1829,13 +1839,13 @@ class SimradRawParser(_SimradDatagramParser):
                     datagram_contents.extend(data['power'])
 
                 if int(data['mode']) & 0x2:
-                    datagram_fmt += '%dH' % (data['count'])
+                    n_angles = data['count'] * 2
+                    datagram_fmt += '%db' % (n_angles)
                     #  reshape the angle array for writing
-                    angles = data['angle'][:,0].astype('uint16') << 8
-                    angles = angles + data['angle'][:,1]
-                    datagram_contents.extend(angles)
+                    data['angle'].shape=(n_angles,)
+                    datagram_contents.extend(data['angle'])
 
-        elif version == 3:
+        elif version == 3 or version == 4:
 
             # Add the spare field
             data['spare'] = ''
@@ -1857,11 +1867,11 @@ class SimradRawParser(_SimradDatagramParser):
 
                 if data['data_type'] & 0b0010:
                     # Add the angle data
-                    datagram_fmt += '%dH' % (data['count'])
+                    n_angles = data['count'] * 2
+                    datagram_fmt += '%db' % (n_angles)
                     #  reshape the angle array for writing
-                    angles = data['angle'][:,0].astype('uint16') << 8
-                    angles = angles + data['angle'][:,1]
-                    datagram_contents.extend(angles)
+                    data['angle'].shape=(n_angles,)
+                    datagram_contents.extend(data['angle'])
 
                 if data['data_type'] & 0b1100:
                     # Add the complex data
