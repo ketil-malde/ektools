@@ -69,7 +69,6 @@ class _SimradDatagramParser(object):
     def header(self, version=0):
         return self._headers[version][:]
 
-
     def validate_data_header(self, data):
 
         if isinstance(data, dict):
@@ -147,6 +146,7 @@ class SimradDepthParser(_SimradDatagramParser):
                       ]
                   }
         _SimradDatagramParser.__init__(self, "DEP", headers)
+
 
     def _unpack_contents(self, raw_string, bytes_read, version):
         '''
@@ -261,7 +261,6 @@ class SimradBottomParser(_SimradDatagramParser):
             buf_indx     = self.header_size(version)
             data['depth'] = np.fromiter(struct.unpack(depth_fmt, raw_string[buf_indx:buf_indx + depth_size]), 'float')
 
-
         return data
 
     def _pack_contents(self, data, version):
@@ -364,9 +363,7 @@ class SimradAnnotationParser(_SimradDatagramParser):
             datagram_fmt += '%ds' % (len(tmp_string))
             datagram_contents.append(tmp_string)
 
-
         return struct.pack(datagram_fmt, *datagram_contents)
-
 
 
 class SimradNMEAParser(_SimradDatagramParser):
@@ -953,7 +950,7 @@ class SimradXMLParser(_SimradDatagramParser):
             # Get the xml obj as a bytes, insert header, and convert to string
             xml_string = ET.tostring(root_node, encoding='utf8', method='xml',
                         pretty_print=True)
-            xml_string = b'<?xml version="1.0" encoding="utf-8"?>\n' + xml_string
+            xml_string = b'<?xml version="1.0" encoding="utf-8" ?>\n' + xml_string
             #print(xml_string.decode('utf-8'))
 
             #Pad with more nulls to 4-byte word boundry if necessary
@@ -1612,7 +1609,8 @@ class SimradRawParser(_SimradDatagramParser):
                     block_size = 2 * data['count'] * data['n_complex'] * type_bytes
 
                     #  convert and reshape the raw string data
-                    data['complex'] = np.frombuffer(raw_string[indx:indx + block_size], dtype=data['complex_dtype'])
+                    data['complex'] = np.frombuffer(raw_string[indx:indx + block_size],
+                            dtype=data['complex_dtype'])
                     data['complex'].shape = (data['count'], 2 * data['n_complex'])
                     data['complex'].dtype = np.complex64
                     # ^- can you do this??!
