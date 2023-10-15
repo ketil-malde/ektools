@@ -32,10 +32,10 @@
 
 """
 
-import numpy as np
 import logging
 import struct
 import re
+import numpy as np
 from collections import OrderedDict
 from lxml import etree as ET
 from .date_conversion import nt_to_unix
@@ -921,10 +921,10 @@ class SimradXMLParser(_SimradDatagramParser):
                             dict_to_dict(transducer_map[transducer_attributes['TransducerName']],
                                 data['configuration'][channel_id], self.xdcrs_xdcr_xml_map)
 
-                #  add the header data to the config dict
-                h = root_node.find('Header')
-                dict_to_dict(h.attrib, data['configuration'][channel_id],
-                             self.header_xml_map)
+                        #  add the header data to the config dict
+                        h = root_node.find('Header')
+                        dict_to_dict(h.attrib, data['configuration'][channel_id],
+                                     self.header_xml_map)
 
             elif data['subtype'] == 'initialparameter':
 
@@ -973,10 +973,12 @@ class SimradXMLParser(_SimradDatagramParser):
                 data['environment']['transducer_name'] = []
                 data['environment']['transducer_sound_speed'] = []
                 for h in root_node.iter('Transducer'):
-                    transducer_xml = h.attrib
-                    data['environment']['transducer_name'].append(transducer_xml['TransducerName'])
-                    data['environment']['transducer_sound_speed'].append(float(transducer_xml['SoundSpeed']))
-
+                    try:  # TODO: what goes wrong here?
+                        transducer_xml = h.attrib
+                        data['environment']['transducer_name'].append(transducer_xml['TransducerName'])
+                        data['environment']['transducer_sound_speed'].append(float(transducer_xml['SoundSpeed']))
+                    except:
+                        pass
         return data
 
 
@@ -1031,7 +1033,7 @@ class SimradXMLParser(_SimradDatagramParser):
                 header_node = root_node.find('./Header')
                 update_xml(header_node, self.header_xml_map, data['configuration'][channel_ids[0]])
 
-                # Now work through the trasceivers sections in the config XML
+                # Now work through the trasceiver sections in the config XML
                 removed_xcvr = False
                 transceivers_node = root_node.find('./Transceivers')
                 for xcvr in transceivers_node.findall('./Transceiver'):
@@ -1366,8 +1368,8 @@ class SimradConfigParser(_SimradDatagramParser):
                                        ('frequency', 'f'),
                                        ('gain', 'f'),
                                        ('equivalent_beam_angle', 'f'),
-                                       ('beamwidth_alongship', 'f'),
-                                       ('beamwidth_athwartship', 'f'),
+                                       ('beam_width_alongship', 'f'),
+                                       ('beam_width_athwartship', 'f'),
                                        ('angle_sensitivity_alongship', 'f'),
                                        ('angle_sensitivity_athwartship', 'f'),
                                        ('angle_offset_alongship', 'f'),
@@ -1392,8 +1394,8 @@ class SimradConfigParser(_SimradDatagramParser):
                                        ('frequency', 'f'),
                                        ('gain', 'f'),
                                        ('equivalent_beam_angle', 'f'),
-                                       ('beamwidth_alongship', 'f'),
-                                       ('beamwidth_athwartship', 'f'),
+                                       ('beam_width_alongship', 'f'),
+                                       ('beam_width_athwartship', 'f'),
                                        ('angle_sensitivity_alongship', 'f'),
                                        ('angle_sensitivity_athwartship', 'f'),
                                        ('angle_offset_alongship', 'f'),
@@ -1418,8 +1420,8 @@ class SimradConfigParser(_SimradDatagramParser):
                                        ('frequency', 'f'),
                                        ('reserved1', 'f'),
                                        ('equivalent_beam_angle', 'f'),
-                                       ('beamwidth_alongship', 'f'),
-                                       ('beamwidth_athwartship', 'f'),
+                                       ('beam_width_alongship', 'f'),
+                                       ('beam_width_athwartship', 'f'),
                                        ('angle_sensitivity_alongship', 'f'),
                                        ('angle_sensitivity_athwartship', 'f'),
                                        ('angle_offset_alongship', 'f'),
