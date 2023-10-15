@@ -26,6 +26,7 @@ def parse(str):
         , b'RAW' : sp.SimradRawParser()
         , b'TAG' : sp.SimradAnnotationParser()
         , b'XML' : sp.SimradXMLParser()
+        , b'IDX' : sp.SimradIDXParser()
     }
 
     dgram_type = str[:3]
