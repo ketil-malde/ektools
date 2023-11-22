@@ -2,7 +2,7 @@
 # Usage: python3 eklist.py -r ../ekdata/2014813-D20180628-T202307.raw| python3 corrplot.py
 # TODO: eklist output TS instead of Sv - filter?
 
-from rawdecode import unpickle_iter
+from ektools.rawdecode import unpickle_iter
 
 import matplotlib.pyplot as plt
 import seaborn as sns
