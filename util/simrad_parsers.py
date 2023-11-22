@@ -14,7 +14,7 @@
 #  SUPPORT TO USERS.
 
 """
-.. module:: echolab2.instruments.util.simrad_parsers
+.. module:: util.simrad_parsers
 
     :synopsis: Parsers for Simrad raw file datagrams
 
@@ -27,8 +27,8 @@
 | Authors:
 |       Zac Berkowitz <zac.berkowitz@gmail.com>
 |       Rick Towler   <rick.towler@noaa.gov>
-| Maintained by:
-|       Rick Towler   <rick.towler@noaa.gov>
+| Modifications/extensions by:
+|       Ketil Malde <ketil@malde.org>
 
 """
 

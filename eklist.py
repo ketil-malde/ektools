@@ -18,8 +18,11 @@ def process(df, verbose=False, filters=[], actions=[]):
                     obj = parse(bstr)
                     for a in actions:
                         a(obj)
-                except:
-                    warn(f'Don\'t know how/failure to parse datagram of type {t}')
+                except IOError: # e.g., broken pipe
+                    exit(0)
+                except Exception as e:
+                    warn(f'Don\'t know how/failure to parse datagram of type {t}\n   Exception: {e}')
+
     # signal end
     for a in actions:
         a(None)
