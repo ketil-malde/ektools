@@ -47,7 +47,7 @@ def calc_range(P_c, sound_vel, sample_interval):
     # sample interval is typically 1/4 tau, so...this should mean one initial zero?
 
     TVG_CORRECTION = 2 # Receiver delay, from pyEcholab
-    n = P_c.shape[0]
+    n = P_c if type(P_c) is int else P_c.shape[0]
     thickness = sound_vel/2 * sample_interval
     Rng = np.zeros(n)
     Rng[TVG_CORRECTION:] = np.linspace(start = 0,stop = (n-TVG_CORRECTION) * sound_vel/2 * sample_interval, num=n-TVG_CORRECTION)
