@@ -2,8 +2,8 @@
 
 # import cProfile
 
-import util.actions as act
-from util.ektools import warn, error, parse, index
+from ektools import actions
+from ektools import warn, error, parse, index
 
 def process(df, verbose=False, filters=[], actions=[]):
     '''Process an indexed Simrad RAW file by applying a set of actions'''
@@ -41,27 +41,27 @@ if __name__ == '__main__':
     p.add_argument('FILE', nargs='+', help='input files in RAW format.')
     args = p.parse_args()
     
-    actions = []
+    myactions = []
 
     if args.list:
         if args.quiet:
             error('Please specify at most one of -l and -q')
             exit(-1)
         else:
-            actions.append(act.showdict)
+            myactions.append(actions.showdict)
     if args.rawdump:
-        actions = [act.rawdump()] # override previous
+        myactions = [actions.rawdump()] # override previous
         args.quiet = True
         if args.list: warn("Ignoring '-l' because '-r' was specified.")
 
     fs = []
-    if args.type: fs.append(act.filtertype(args.type))
+    if args.type: fs.append(actions.filtertype(args.type))
 
-    if args.check:     actions.append(act.checkdate())
-    if args.summarize: actions.append(act.summarize())
+    if args.check:     myactions.append(actions.checkdate())
+    if args.summarize: myactions.append(actions.summarize())
     
     for f in args.FILE:
         # print(f)
         d = index(f)
         # cProfile.run("process(d, verbose=not args.quiet, actions=actions, filters=fs)")
-        process(d, verbose=not args.quiet, actions=actions, filters=fs)
+        process(d, verbose=not args.quiet, actions=myactions, filters=fs)

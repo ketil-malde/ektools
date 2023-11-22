@@ -14,7 +14,7 @@
 #  SUPPORT TO USERS.
 
 """
-.. module:: util.simrad_parsers
+.. module:: ektools.simrad_parsers
 
     :synopsis: Parsers for Simrad raw file datagrams
 

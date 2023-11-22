@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-from util.ektools import parse, index, warn, error
+from ektools import parse, index, warn, error
 
 import datetime
 import hashlib
@@ -137,7 +137,7 @@ def genmeta(f):
 if __name__ == '__main__':
 
     import argparse
-    from util.actions import showdict
+    from ektools.actions import showdict
 
     p = argparse.ArgumentParser(description='Generate metadata from Simrad RAW files.')
     # p.add_argument()

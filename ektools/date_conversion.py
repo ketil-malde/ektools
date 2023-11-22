@@ -14,7 +14,7 @@
 #  SUPPORT TO USERS.
 
 '''
-.. module:: echolab.instruments.util.unit_conversion
+.. module:: ektools.date_conversion
 
 
 useful functions:
