@@ -9,5 +9,5 @@ setup(name='ektools',
       license='MIT',
       packages=['ektools'],
       scripts=['tools/eklist'],
-#      install_requires=[pynmea2],
+      install_requires=['pynmea2'],
       zip_safe=False)
