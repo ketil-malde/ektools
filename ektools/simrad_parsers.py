@@ -27,7 +27,6 @@
 | Authors:
 |       Zac Berkowitz <zac.berkowitz@gmail.com>
 |       Rick Towler   <rick.towler@noaa.gov>
-| Modifications/extensions by:
 |       Ketil Malde <ketil@malde.org>
 
 """
@@ -479,6 +478,37 @@ class SimradMRUParser(_SimradDatagramParser):
         pitch:        float
         heading:      float
 
+    Version 1 contains (from https://www3.mbari.org/products/mbsystem/formatdoc/KongsbergKmall/EMdgmFormat_RevH/html/kmBinary.html):
+
+    Status word	See 1)	uint32	4U
+    Latitude	deg	double	8F
+    Longitude	deg	double	8F
+    Ellipsoid height	m	float	4F
+    Roll	deg	float	4F
+    Pitch	deg	float	4F
+    Heading	deg	float	4F
+    Heave	m	float	4F
+    Roll rate	deg/s	float	4F
+    Pitch rate	deg/s	float	4F
+    Yaw rate	deg/s	float	4F
+    North velocity	m/s	float	4F
+    East velocity	m/s	float	4F
+    Down velocity	m/s	float	4F
+    Latitude error	m	float	4F
+    Longitude error	m	float	4F
+    Height error	m	float	4F
+    Roll error	deg	float	4F
+    Pitch error	deg	float	4F
+    Heading error	deg	float	4F
+    Heave error	m	float	4F
+    North acceleration	m/s2	float	4F
+    East acceleration	m/s2	float	4F
+    Down acceleration	m/s2	float	4F
+    Delayed heave:	-	-	-
+    UTC seconds	s	uint32	4U
+    UTC nanoseconds	ns	uint32	4U
+    Delayed heave	m	float	4F
+
     The following methods are defined:
 
         from_string(str):    parse a raw ER60 NMEA datagram
@@ -495,8 +525,39 @@ class SimradMRUParser(_SimradDatagramParser):
                        ('heave', 'f'),
                        ('roll', 'f'),
                        ('pitch', 'f'),
+                       ('heading', 'f')],
+                   1: [('type', '4s'),
+                       ('low_date', 'L'),
+                       ('high_date', 'L'),
+                       ('start_id', '4s'), # KMB#
+                       ('status_word', 'L'),
+                       ('dummy', '12s'),
+                       ('latitude', 'd'),
+                       ('longtitude', 'd'),
+                       ('ellipsoid_height', 'f'),
+                       ('roll', 'f'),
+                       ('pitch', 'f'),
                        ('heading', 'f'),
-                      ]
+                       ('heave', 'f'),
+                       ('roll_rate', 'f'),
+                       ('pitch_rate', 'f'),
+                       ('yaw_rate', 'f'),
+                       ('velocity_north', 'f'),
+                       ('velocity_east', 'f'),
+                       ('velocity_down', 'f'),
+                       ('latitude_error', 'f'),
+                       ('longtitude_error', 'f'),
+                       ('height_error', 'f'),
+                       ('roll_error', 'f'),
+                       ('pitch_error', 'f'),
+                       ('heading_error', 'f'),
+                       ('heave_error', 'f'),
+                       ('accel_north', 'f'),
+                       ('accel_east', 'f'),                       
+                       ('accel_down', 'f'),
+                       ('heave_delay_high', 'L'),
+                       ('heave_delay_low', 'L'),
+                       ('heave_delayed', 'f')]
                    }
 
         _SimradDatagramParser.__init__(self, b'MRU', headers)
@@ -520,8 +581,12 @@ class SimradMRUParser(_SimradDatagramParser):
 
         data['timestamp'] = nt_to_unix((data['low_date'], data['high_date']))
         data['timestamp'] = data['timestamp'].replace(tzinfo=None)
-        data['bytes_read'] = bytes_read
 
+#        if version == 1:
+#            data['heave_delay'] = nt_to_unix((data['heave_delay_low'], data['heave_delay_high']))
+#            data['heave_delay'] = data['heave_delay'].replace(tzinfo=None)
+
+        data['bytes_read'] = bytes_read
         return data
 
     def _pack_contents(self, data, version):
