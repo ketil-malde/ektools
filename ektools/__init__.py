@@ -12,6 +12,8 @@ def error(*args, **kwargs):
     print('\033[91mError:\033[0m',*args, file=sys.stderr, **kwargs)
 
 import ektools.simrad_parsers as sp
+import ektools.korona_parsers as kp
+
 def parse(str):
     '''Table for selecting the correct parser to use for datagrams.
        Throws an exception if the datagram isn't known.'''
@@ -27,6 +29,10 @@ def parse(str):
         , b'TAG' : sp.SimradAnnotationParser()
         , b'XML' : sp.SimradXMLParser()
         , b'IDX' : sp.SimradIDXParser()
+
+        , b'TNF' : kp.SimradTrackInfoParser()
+        , b'TBR' : kp.SimradTrackBorderParser()
+        , b'TTC' : kp.SimradTrackContentsParser()
     }
 
     dgram_type = str[:3]
