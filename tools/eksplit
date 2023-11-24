@@ -16,7 +16,10 @@ confs = set([ k.split('_')[-1] for k in config['configuration'].keys()])
 print('Configurations:', confs)
 
 def matches(predicate, msg):
-    p = parse(msg)
+    try:
+        p = parse(msg)
+    except:
+        return False
     if 'channel_id' in p.keys():
         return predicate(p['channel_id'].decode())
     elif 'parameter' in p.keys():

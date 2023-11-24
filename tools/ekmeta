@@ -32,7 +32,11 @@ def genmeta(f):
     temperatures = []
     
     for pos, typ, ln, bstr in index(f):
-        obj = parse(bstr)
+        try:
+            obj = parse(bstr)
+        except:
+            warn(f'Couldn\'t parse datagram of type {typ}, position {pos}.')
+            continue
         if starttime is None:
             starttime = obj['timestamp']
         endtime = obj['timestamp']  # last time standing
