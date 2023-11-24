@@ -1,9 +1,15 @@
 Ektools is a small collection of utilities/library functions to work
-with EK60 echo sounder data.  There are two executable programs which
-take a RAW file as their parameter:
+with Simrad EK60 and EK80 echo sounder data.  There are two executable
+programs which take a RAW file as their parameter:
 
-- ekplot.py - simple plot of the raw data from each channel
-- eklist.py - extracts various information from the RAW file
+- ekplot - simple plot of the raw data from each channel
+- eklist - extracts various information from the RAW file
+- ekmeta - display metadata (times and locations, etc)
+- eksplit - split a RAW file by configuration
+
+The `ektools` library provides fast indexing functions, and parsers
+(mostly taken from the `PyEchoLab` package) for the various datagrams
+used by Simrad and the Korona processing package.
 
 # Examples
 
@@ -16,6 +22,11 @@ arrays):
 
     eklist -l file.raw
 	
+Only print detailed information on specific datagrams (in this case,
+MRU datagrams containing information on ship movement):
+
+	eklist -ql -t MRU0 -t MRU1 file.raw
+
 Check contents of the file for consistency (`-c`), while suppressing
 other output (`-q`):
 
@@ -26,15 +37,14 @@ in a binary stream to stdout:
 
     eklist -qr file.raw
 	
-The `rawdecode.py` program demonstrates how to read the stream back in
+The `rawdecode.py` file demonstrates how to read the stream back in
 again.
 
-# Structure
+Extract metadata from a RAW file:
 
-The `eklist` program mainly parses the input and processes it with a
-user-selected set of functions, defined in `actions.py`.  Of
-particular interest is the function `type3_convert()`, which converts
-from the native RAW format, to standard /sv/ values.
+	ekmeta file.raw
+	
+Separate a RAW file into its different configurations:
 
-The parsers for individual datagrams are taken from PyEchoLab, and can
-be found in the `util` subdirectory.
+	eksplit file.raw
+

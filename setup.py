@@ -8,6 +8,6 @@ setup(name='ektools',
       author_email='ketil@malde.org',
       license='MIT',
       packages=['ektools'],
-      scripts=['tools/eklist'],
+      scripts=['tools/eklist','tools/eksplit','tools/ekplot', 'tools/ekmeta'],
       install_requires=['pynmea2'],
       zip_safe=False)
