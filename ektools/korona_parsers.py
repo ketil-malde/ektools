@@ -1,4 +1,6 @@
 from .simrad_parsers import _SimradDatagramParser
+import struct
+from .date_conversion import nt_to_unix
 
 """
 These parsers are similar to Simrad Parsers, but process datagrams 
