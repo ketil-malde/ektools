@@ -1,0 +1,4 @@
+pynmea2
+numpy
+lxml
+pytz

@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 # Usage: python3 eklist.py -r ../ekdata/2014813-D20180628-T202307.raw| python3 corrplot.py
 # TODO: eklist output TS instead of Sv - filter?
 
