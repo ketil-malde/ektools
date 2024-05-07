@@ -27,10 +27,10 @@ def genmeta(f):
     heaves = []
     rolls = []
     pitch = []
-    # EK80 does these differently    
-    sound_speed = None  
+    # EK80 does these differently
+    sound_speed = None
     temperatures = []
-    
+
     for pos, typ, ln, bstr in index(f):
         try:
             obj = parse(bstr)
@@ -45,7 +45,7 @@ def genmeta(f):
             for tspname in obj['configuration']:
                 tsp = obj['configuration'][tspname]
                 fq = int(tsp['frequency'])
-                rcounts[fq] = { 'transducer': tspname, 'pings': 0, 'ranges': [] }
+                rcounts[fq] = {'transducer': tspname, 'pings': 0, 'ranges': []}
 
                 snm = tsp['survey_name'].decode('latin-1')
                 if survey_name is None:

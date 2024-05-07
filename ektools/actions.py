@@ -33,6 +33,8 @@ def showdict(obj, indent=4):
             print(indent*' ',k,'{')
             showdict(obj[k], indent+4)
             print(indent*' ','}')
+        elif isinstance(obj[k], datetime):
+            print(indent*' ', k, obj[k].strftime("%Y-%m-%d %H:%M:%S%Z"))
         else:
             print(indent*' ', k, repr(obj[k])[:72])
 

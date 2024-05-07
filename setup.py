@@ -11,5 +11,5 @@ setup(name='ektools',
       license='MIT',
       packages=['ektools'],
       scripts=['tools/eklist','tools/eksplit','tools/ekplot', 'tools/ekmeta'],
-      install_requires=['pynmea2'],
+      install_requires=['pynmea2', 'numpy', 'lxml', 'pytz'],
       zip_safe=False)

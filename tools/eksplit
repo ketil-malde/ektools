@@ -12,7 +12,7 @@ idx = index(fn)
 config = parse(idx[0][3])
 
 assert config['subtype'] == 'configuration'
-confs = set([ k.split('_')[-1] for k in config['configuration'].keys()])
+confs = set([k.split('_')[-1] for k in config['configuration'].keys()])
 print('Configurations:', confs)
 
 def matches(predicate, msg):
