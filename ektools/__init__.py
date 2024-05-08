@@ -39,20 +39,22 @@ def parse(str):
     p = parsers[dgram_type]
     return(p.from_string(str, len(str)))
 
-def index(f):
+def index(f, maxcount=None):
     '''Build an index of datagrams in a Simrad RAW file.  This is a list of position, type, length, and (unparsed) contents.'''
     idx = []
     with open(f, "rb") as fh:
         with mmap.mmap(fh.fileno(), length=0, access=mmap.ACCESS_READ) as mf:
             pos = 0
-            while pos < len(mf):
                 l, m = struct.unpack('<l4s', mf[pos:pos+8])
                 if pos+l > len(mf):
+            count = 0
+            while pos < len(mf) and (maxcount is None or count < maxcount):
                     raise Exception('Premature EOF, truncated RAW file?')
                 v = struct.unpack('<l', mf[pos+l+4:pos+l+8])
                 t = m.decode('latin-1')
                 if v[0]!=l: warn(f'Datagram at {pos}: control lenght mismatch ({l} vs {v[0]}) - endianness error or corrupt file?')
                 idx.append((pos,t,l,mf[pos+4:pos+4+l]))
                 pos += l+8
+                count += 1
     return idx
     
