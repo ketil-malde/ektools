@@ -13,12 +13,12 @@ def process(df, verbose=False, filters=[], actions=[]):
             print(f'Datagram {count}:\t{pos}\t{l}\t{t}')
         count += 1
         if actions:
-            if filters == [] or any(f(pos,t,l) for f in filters):
+            if filters == [] or any(f(pos, t, l) for f in filters):
                 try:
                     obj = parse(bstr)
                     for a in actions:
                         a(obj)
-                except IOError: # e.g., broken pipe
+                except IOError:  # e.g., broken pipe
                     exit(0)
                 except Exception as e:
                     warn(f'Don\'t know how/failure to parse datagram of type {t}\n   Exception: {e}')
@@ -32,8 +32,8 @@ if __name__ == '__main__':
     import argparse
 
     p = argparse.ArgumentParser(description='Extract information from Simrad RAW files.')
-    p.add_argument('-t', '--type',  default=[], action='append', help='only apply to given datagram types')
-    p.add_argument('-l', '--list',  action='store_true', help='output datagram contents extensively')
+    p.add_argument('-t', '--type', default=[], action='append', help='only apply to given datagram types')
+    p.add_argument('-l', '--list', action='store_true', help='output datagram contents extensively')
     p.add_argument('-s', '--summarize', action='store_true', help='summarize datagrams')
     p.add_argument('-q', '--quiet', action='store_true', help='produce minimal output')
     p.add_argument('-c', '--check', action='store_true', help='check datagram contents for consistency')
@@ -50,7 +50,7 @@ if __name__ == '__main__':
         else:
             myactions.append(actions.showdict)
     if args.rawdump:
-        myactions = [actions.rawdump()] # override previous
+        myactions = [actions.rawdump()]  # override previous
         args.quiet = True
         if args.list: warn("Ignoring '-l' because '-r' was specified.")
 
@@ -59,7 +59,7 @@ if __name__ == '__main__':
 
     if args.check:     myactions.append(actions.checkdate())
     if args.summarize: myactions.append(actions.summarize())
-    
+
     for f in args.FILE:
         # print(f)
         d = index(f)

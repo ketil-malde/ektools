@@ -10,8 +10,10 @@ fn = sys.argv[1]
 idx = index(fn)
 
 config = parse(idx[0][3])
-
 assert config['subtype'] == 'configuration'
+# config2 = parse(idx[1][3])
+# assert config2['subtype'] == 'initialparameter'
+
 confs = set([k.split('_')[-1] for k in config['configuration'].keys()])
 print('Configurations:', confs)
 
@@ -29,7 +31,7 @@ def matches(predicate, msg):
 
 def dgram_write(f, dgram):
     """Write a datagram to a file"""
-    hdr = struct.pack('<l',len(dgram))
+    hdr = struct.pack('<l', len(dgram))
     f.write(hdr)
     f.write(dgram)
     f.write(hdr)
@@ -51,7 +53,7 @@ def edit_xml(predicate, xmlstr):
 
 split = {}
 for a in confs:
-    split[a] = [(p,t,l,m) for p,t,l,m in index(fn) if matches(lambda c : c.split('_')[-1] == a, m)]
+    split[a] = [(p, t, l, m) for p, t, l, m in index(fn) if matches(lambda c: c.split('_')[-1] == a, m)]
 
 for a in confs:
     print(f'Config {a}, count: {len(split[a])}')
@@ -60,18 +62,16 @@ for a in confs:
         if x[1] not in counts:
             counts[x[1]] = 1
         else:
-            counts[x[1]]+=1
+            counts[x[1]] += 1
     print(counts)
 
-    outname = os.path.splitext(os.path.basename(fn))[0]+'_'+a+'.raw'
+    outname = os.path.splitext(os.path.basename(fn))[0] + '_' + a + '.raw'
     with open(outname, 'wb') as f:
         # Output configuration datagram
         xmlconf = idx[0][3][12:-2]
-        x0 = et.tostring(edit_xml(lambda c: c.split('_')[-1]==a, xmlconf))
-        dgram_write(f,split[a][0][3][:12]+x0)
+        x0 = et.tostring(edit_xml(lambda c: c.split('_')[-1] == a, xmlconf))
+        dgram_write(f, split[a][0][3][:12] + x0)
 
-        for (pos,typ,length,dgram) in split[a][1:]:
+        for (pos, typ, length, dgram) in split[a][1:]:
             # write length (dgram already contains type)
-            dgram_write(f,dgram)
-        
-    
+            dgram_write(f, dgram)
