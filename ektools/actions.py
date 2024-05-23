@@ -29,15 +29,16 @@ def checkgps(obj):
 def showdict(obj, indent=4):
     if obj is None: return
     for k in obj.keys():
-        if type(obj[k]) == type({}):
-            print(indent*' ',k,'{')
-            showdict(obj[k], indent+4)
-            print(indent*' ','}')
+        if isinstance(obj[k], dict):
+            print(indent * ' ', k, '{')
+            showdict(obj[k], indent + 4)
+            print(indent * ' ', '}')
         elif isinstance(obj[k], datetime):
-            print(indent*' ', k, obj[k].strftime("%Y-%m-%d %H:%M:%S%Z"))
+            print(indent * ' ', k, obj[k].strftime("%Y-%m-%d %H:%M:%S%Z"))
         else:
-            print(indent*' ', k, repr(obj[k])[:72])
+            print(indent * ' ', k, repr(obj[k])[:72])
 
+# flake8: noqa E402            
 import pickle
 import sys
 
