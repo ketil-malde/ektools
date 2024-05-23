@@ -2,6 +2,8 @@ import sys
 import struct
 import mmap
 
+from ektools.date_conversion import nt_to_unix
+
 # text colors: GREEN = '\033[92m', BLUE = '\033[94m', HEADER = '\033[95m', CYAN = '\033[96m', BOLD = '\033[1m', UNDERLINE = '\033[4m'
 #              CLEAR = '\033[0m', YELLOW = '\033[93m', RED = '\033[91m'
 
