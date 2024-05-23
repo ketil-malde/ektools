@@ -57,3 +57,39 @@ def index(f, maxcount=None):
                 pos += l + 8
                 count += 1
     return idx
+
+# Support for d in ekfile('D2022012345.raw').dgrams():
+class ekfile():
+    def __init__(self, filename):
+        self.fname = filename
+
+    def datagrams(self):
+        return ekfile_iterator(self.fname)
+
+class ekfile_iterator():
+    def __init__(self, fname):
+        self.fname = fname
+
+    def __iter__(self):
+        self.fhandle = open(self.fname, 'rb')
+        return self
+
+    def __next__(self):
+        try:
+            dg = self.read_dgram(self.fhandle)
+        except struct.error:
+            raise StopIteration
+        return dg
+
+    def read_dgram(self, fh):
+        # read two longs
+        buf = fh.read(4)
+        length = struct.unpack('<l', buf)[0]
+        msg = fh.read(length)
+        msgtype = struct.unpack('4s', msg[:4])[0].decode('latin1')
+        # Are we certain there is always a date stamp here?
+        ntdate = struct.unpack('<2l', msg[4:12])
+        buf = fh.read(4)
+        v = struct.unpack('<l', buf)
+        if v[0] != length: warn(f'Datagram control lenght mismatch ({length} vs {v[0]}) - endianness error or corrupt file?')
+        return (msgtype, length, nt_to_unix(ntdate).replace(tzinfo=None), msg)
