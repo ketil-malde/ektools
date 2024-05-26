@@ -6,8 +6,11 @@ import sys
 import os.path
 
 fn = sys.argv[1]
-
 idx = index(fn)
+
+"""Looks like Datagram 0 contains general configuration,
+   datagram 1 ('initialparameter') contains more specifics, both
+   have elements that containg dicts with channel-named elements."""
 
 config = parse(idx[0][3])
 assert config['subtype'] == 'configuration'

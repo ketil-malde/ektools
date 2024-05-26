@@ -9,7 +9,8 @@ files = sys.argv[1:]
 ekfiles = [ekfile(f) for f in files]
 iters = [iter(e.datagrams()) for e in ekfiles]
 heads = [next(i) for i in iters]
-while iters:  # is not empty
+
+while iters:
     dates = [h[2] for h in heads]
     # find earliest date e
     e = dates.index(min(dates))
@@ -23,6 +24,5 @@ while iters:  # is not empty
     try:
         heads[e] = next(iters[e])
     except StopIteration:
-        # except some exception
         iters = iters[:e] + iters[e + 1:]
         heads = heads[:e] + heads[e + 1:]
