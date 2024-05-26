@@ -48,3 +48,11 @@ Separate a RAW file into its different configurations:
 
 	eksplit file.raw
 
+Convert position data from a GPX file into a sequence of RAW
+datagrams:
+
+	gpx2nmea locations.gpx > locations.raw
+
+Merging it into a RAW file containing echo sounder output:
+
+	ekmerge locations.raw D20240526012345.raw > merged.raw
