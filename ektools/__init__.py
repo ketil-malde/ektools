@@ -73,7 +73,10 @@ class ekfile_iterator():
         self.fname = fname
 
     def __iter__(self):
-        self.fhandle = open(self.fname, 'rb')
+        if self.fname == '-':
+            self.fhandle = sys.stdin.buffer
+        else:
+            self.fhandle = open(self.fname, 'rb')
         return self
 
     def __next__(self):
