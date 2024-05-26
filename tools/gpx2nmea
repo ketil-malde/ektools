@@ -1,0 +1,61 @@
+#!/usr/bin/env python3
+
+# Parse a GPX file and output a sequence of GPGGA NMEA sentences
+# https://docs.novatel.com/OEM7/Content/Logs/GPGGA.htm
+
+import sys
+import math
+import struct
+from lxml import etree
+from datetime import datetime
+from ektools.date_conversion import unix_to_nt
+
+def convert(deg, direction):
+    '''Convert from decimal degrees in GPX to DD(D)MM.MMM for nmea'''
+    if deg < 0:
+        negative = True
+        deg = -deg
+    else:
+        negative = False
+    f, i = math.modf(deg)
+    mins = f * 100 / 60
+
+    if direction == 'lat':
+        mydir = 'S' if negative else 'N'
+        mydeg = f'{int(i):02d}'
+    elif direction == 'lon':
+        mydir = 'W' if negative else 'E'
+        mydeg = f'{int(i):03d}'
+
+    return f'{mydeg}{mins:011.8f},{mydir}'
+
+def checksum(str):
+    '''Calculate the NMEA checksum'''
+    checksum = 0
+    for c in str:
+        checksum = checksum ^ ord(c)
+    return checksum
+
+# Fucking namespace shit
+NS = '{http://www.topografix.com/GPX/1/1}'
+
+doc = etree.parse(sys.argv[1])
+for x in doc.iter(f'{NS}trkpt'):
+    # print(x.tag)
+    lat = float(x.attrib['lat'])
+    lon = float(x.attrib['lon'])
+    ele = float(x.find(f'{NS}ele').text)
+    ts = datetime.strptime(x.find(f'{NS}time').text, "%Y-%m-%dT%H:%M:%SZ")
+
+    # print(f'lat={lat} lon={lon} ele={ele} time={ts}')
+
+    #  msgid time   latitude    longtitude   d nsats hdil, alt, altunit(M), sea lev, unit(M), time since diff, stid, checksum
+    # $GPGGA,210230,3855.4487,N,09446.0071,W,1,07,1.1,370.5,M,-29.5,M,,*7A
+    nmea = f'GPGGA,{ts.strftime("%H%M%S")},{convert(lat, "lat")},{convert(lon, "lon")},1,0,{ele},M,0,M,,'
+    data = f'${nmea}*{checksum(nmea):X}\r\n'.encode()
+    raw_ts = unix_to_nt(ts)
+    msglen = len(data)+12
+
+    # print
+    output = struct.pack(f'<l4s2L{len(data)}sl', msglen, b'NME0', raw_ts[0], raw_ts[1], data, msglen)
+    sys.stdout.buffer.write(output)
