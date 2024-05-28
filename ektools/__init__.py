@@ -93,8 +93,11 @@ class ekfile_iterator():
         msg = fh.read(length)
         msgtype = struct.unpack('4s', msg[:4])[0].decode('latin1')
         # Are we certain there is always a date stamp here?
-        ntdate = struct.unpack('<2l', msg[4:12])
+        ntdate = struct.unpack('<2L', msg[4:12])
+        mydate = nt_to_unix(ntdate).replace(tzinfo=None)
+        # for testing:
+        # assert mydate == parse(msg)['timestamp'], f'{mydate} != {parse(msg)["timestamp"]}'
         buf = fh.read(4)
         v = struct.unpack('<l', buf)
         if v[0] != length: warn(f'Datagram control lenght mismatch ({length} vs {v[0]}) - endianness error or corrupt file?')
-        return (msgtype, length, nt_to_unix(ntdate).replace(tzinfo=None), msg)
+        return (msgtype, length, mydate, msg)
