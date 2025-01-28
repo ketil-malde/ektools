@@ -1,5 +1,5 @@
 Ektools is a small collection of utilities/library functions to work
-with Simrad EK60 and EK80 echo sounder data.  There are two executable
+with Simrad EK60 and EK80 echo sounder data.  There are several executable
 programs which take a RAW file as their parameter:
 
 - ekplot - simple plot of the raw data from each channel
@@ -13,7 +13,7 @@ used by Simrad and the Korona processing package.
 
 # Examples
 
-List an index of the datagrams in `file.raw`:
+To list an index of the datagrams in `file.raw` from the shell:
 
     eklist file.raw
 
