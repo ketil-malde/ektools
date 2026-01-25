@@ -122,7 +122,7 @@ class SimradTrackContentsParser(_SimradDatagramParser):
                        ('validCount', 'L')]  # The number of valid tracks
                    }
 
-        _SimradDatagramParser.__init__(self, "TCO", headers)
+        _SimradDatagramParser.__init__(self, "TTC", headers)
 
     def _unpack_contents(self, raw_string, length, version=0):
         # assert self.header_size(0) == length, "Datagram length does not match format"
